@@ -14,7 +14,7 @@ It supports the 5 states:
 
 The following configuration properties are supported
 
-| Config property | Default Value | Special values |
+| Config property | Default Value | Special Values |
 | ------------- | ------------- | --------|
 | failureRateThreshold  | 50  | If set to 0, breaker will not open due to failures |
 | slowCallRateThreshold  | 100 | If set to 0, breaker will not open due to slow calls |
