@@ -25,9 +25,7 @@ class BreakerClosedState implements CircuitBreakerStateInterface {
 	    callCount = 0;
 	    failureCallCount = 0;
 	    slowCallDurationCount = 0;
-    	long now = System.currentTimeMillis();
-    	int nowInSec = (int)(now / 1000);
-	    lastCallTimestampInSec = nowInSec;
+    	lastCallTimestampInSec = (int)(System.currentTimeMillis() / 1000);
 	}
 	
 	@Override
@@ -65,7 +63,7 @@ class BreakerClosedState implements CircuitBreakerStateInterface {
     			clearAllBuckets();
     		}
     		else {
-    			for(int timeInSec = lastCallTimestampInSec; timeInSec<nowInSec; timeInSec++)
+    			for(int timeInSec = lastCallTimestampInSec + 1; timeInSec <= nowInSec; timeInSec++)
     				clearBucket(timeInSec);
     			lastCallTimestampInSec = nowInSec;
     		}
@@ -77,6 +75,7 @@ class BreakerClosedState implements CircuitBreakerStateInterface {
     			circuitBreaker.moveToOpenState();
     		}
     	}
+    	System.out.println("callCount, failureCallCount, slowCallDurationCount=" + callCount + "," + failureCallCount + "," + slowCallDurationCount);
     }
     
     private void addToLastCallTimestampInSecBucket(boolean isFailureCall, boolean isSlowCall) {
