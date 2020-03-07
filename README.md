@@ -41,7 +41,7 @@ loop
       circuitBreaker.callFailed(doSomething duration);
 ```
 
-## Circuit Breaker Configuration
+## Circuit Breaker Configuration using Properties
 The circuit breaker can easily be configured using `java.util.Properties`, possibly adding prefix, for example:
 
 ```
