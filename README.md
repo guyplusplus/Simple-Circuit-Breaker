@@ -16,9 +16,9 @@ The following configuration properties are supported
 
 | Config property | Default Value | Special Values |
 | ------------- | ------------- | --------|
-| failureRateThreshold  | 50  | If set to 0, breaker will not open due to failures |
-| slowCallRateThreshold  | 100 | If set to 0, breaker will not open due to slow calls |
-| slowCallDurationThreshold  | 60000 [ms] | If set to 0, breaker will not open due to slow calls |
+| failureRateThreshold  | 50  | If set to 0, breaker will ignore failures |
+| slowCallRateThreshold  | 100 | If set to 0, breaker will ignore slow calls |
+| slowCallDurationThreshold  | 60000 [ms] | If set to 0, breaker will ignore slow calls |
 | permittedNumberOfCallsInHalfOpenState  | 10 | 0 to move from open to closed state directly, without any half-open state |
 | slidingWindowSize  | 100 [s] | 0 to set breaker in DISABLED state, -1 to set breaker in FORCED_OPEN state |
 | minimumNumberOfCalls  | 10 | |
