@@ -1,6 +1,6 @@
 package com.geckotechnology.simpleCircuitBreaker;
 
-class BreakerOpenState implements CircuitBreakerStateInterface {
+class BreakerOpenState implements BreakerStateInterface {
 
 	private final CircuitBreaker circuitBreaker;
 	private long openStateEndTimestamp;

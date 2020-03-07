@@ -1,6 +1,6 @@
 package com.geckotechnology.simpleCircuitBreaker;
 
-class BreakerClosedState implements CircuitBreakerStateInterface {
+class BreakerClosedState implements BreakerStateInterface {
 
 	private final CircuitBreaker circuitBreaker;
 	private final int slidingWindowSize;
@@ -96,5 +96,26 @@ class BreakerClosedState implements CircuitBreakerStateInterface {
 		failureCallCountBuckets[bucket] = 0;
 		slowCallDurationCount -= slowCallDurationCountBuckets[bucket];
 		slowCallDurationCountBuckets[bucket] = 0;
+    }
+    
+    /**
+     * Method used during development to validate array and sum are correctly alligned
+     */
+    private void testCheckSum() {
+        int aCallCount = 0;
+        int aFailureCallCount = 0;
+        int aSlowCallDurationCount = 0;
+    	for(int i = 0; i<slidingWindowSize; i++) {
+    		aCallCount += callCountBuckets[i];
+    		aFailureCallCount += failureCallCountBuckets[i];
+    		aSlowCallDurationCount += slowCallDurationCountBuckets[i];
+    	}
+    	if(aCallCount != callCount ||
+    			aFailureCallCount != failureCallCount ||
+    			aSlowCallDurationCount != slowCallDurationCount) {
+    		System.out.println("incremental callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
+    		System.out.println("calculated  callCount: " + aCallCount + ", failureCallCount: " + aFailureCallCount + ", slowCallDurationCount: " + aSlowCallDurationCount);
+    		System.exit(1);
+    	}
     }
 }

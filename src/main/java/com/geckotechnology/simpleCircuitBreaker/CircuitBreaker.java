@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 public class CircuitBreaker {
 
     private static final Logger logger = Logger.getLogger(CircuitBreaker.class.getName());
-    private CircuitBreakerStateInterface breakerState;
+    private BreakerStateInterface breakerState;
     private final CircuitBreakerConfig circuitBreakerConfig;
 
     public CircuitBreaker(CircuitBreakerConfig aCircuitBreakerDefinition) {

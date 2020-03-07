@@ -1,6 +1,6 @@
 package com.geckotechnology.simpleCircuitBreaker;
 
-class BreakerDisabledState implements CircuitBreakerStateInterface {
+class BreakerDisabledState implements BreakerStateInterface {
 
 	BreakerDisabledState(CircuitBreaker circuitBreaker) {
 	}

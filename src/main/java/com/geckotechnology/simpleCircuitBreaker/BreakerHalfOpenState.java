@@ -2,7 +2,7 @@ package com.geckotechnology.simpleCircuitBreaker;
 
 import java.util.logging.Logger;
 
-class BreakerHalfOpenState implements CircuitBreakerStateInterface {
+class BreakerHalfOpenState implements BreakerStateInterface {
 
     private static final Logger logger = Logger.getLogger(BreakerHalfOpenState.class.getName());
 	private final CircuitBreaker circuitBreaker;
