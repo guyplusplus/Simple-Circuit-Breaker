@@ -33,7 +33,7 @@ public class CircuitBreaker {
     	breakerState.callSucceeded(callDuration);
     }
     
-    //------ Only Private and Package methods bellow --------------------------
+    //------ Only Private and Default access methods bellow --------------------------
     
     void moveToClosedState() {
     	breakerState = new BreakerClosedState(this);
