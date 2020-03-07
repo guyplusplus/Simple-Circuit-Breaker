@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.geckotechnology.simpleCircuitBreaker</groupId>
+  <artifactId>simpleCircuitBreaker</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  
+  <name>SimpleCircuitBreaker</name>
+  <url>https://github.com/guyplusplus/Simple-Circuit-Breaker</url>
+  <description></description>
+
+  <licenses>
+    <license>
+      <name>GPL 3.0</name>
+      <url>https://github.com/guyplusplus/Simple-Circuit-Breaker/LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>guy</name>
+      <organization>GeckoTechnology</organization>
+      <organizationUrl>http://www.GeckoTechnology.com</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <url>https://github.com/guyplusplus/Simple-Circuit-Breaker</url>
+    <connection>scm:git:git://github.com/guyplusplus/Simple-Circuit-Breaker.git</connection>
+    <developerConnection>scm:git:git://github.com/guyplusplus/Simple-Circuit-Breaker.git</developerConnection>
+  </scm>
+
+  <properties>
+    <!-- https://maven.apache.org/general.html#encoding-warning -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+    <jdk.version>1.7</jdk.version>
+    <junit.version>4.11</junit.version>
+  </properties>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
