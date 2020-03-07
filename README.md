@@ -26,7 +26,7 @@ The following configuration properties are supported
 
 
 ## Sample Code
-Code should look like this:
+Pseudo-code should look like this:
 
 ```
 CircuitBreakerConfig config = new CircuitBreakerConfig();
