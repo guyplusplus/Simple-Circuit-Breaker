@@ -51,18 +51,20 @@ class BreakerClosedState implements CircuitBreakerStateInterface {
     		slowCallDurationCount++;
     		isSlowCall = true;
     	}
-    	long now = System.currentTimeMillis();
-    	int nowInSec = (int)(now / 1000);
+    	int nowInSec = (int)(System.currentTimeMillis() / 1000);
     	if(lastCallTimestampInSec == nowInSec) {
-    		//just add to last bucket
+    		//just add to current bucket, we are still in the same second
     		addToLastCallTimestampInSecBucket(isFailureCall, isSlowCall);
     	}
     	else {
+    		//compared to lastCallTimestampInSec, we moved next second or more
     		if((nowInSec - lastCallTimestampInSec) >= slidingWindowSize) {
-    			//clear all buckets
+    			//compared to lastCallTimestampInSec, there is more than slidingWindowSize difference
+    			//then clear all buckets
     			clearAllBuckets();
     		}
     		else {
+    			//only few buckets need to be cleared
     			for(int timeInSec = lastCallTimestampInSec + 1; timeInSec <= nowInSec; timeInSec++)
     				clearBucket(timeInSec);
     			lastCallTimestampInSec = nowInSec;
@@ -75,7 +77,6 @@ class BreakerClosedState implements CircuitBreakerStateInterface {
     			circuitBreaker.moveToOpenState();
     		}
     	}
-    	System.out.println("callCount, failureCallCount, slowCallDurationCount=" + callCount + "," + failureCallCount + "," + slowCallDurationCount);
     }
     
     private void addToLastCallTimestampInSecBucket(boolean isFailureCall, boolean isSlowCall) {
