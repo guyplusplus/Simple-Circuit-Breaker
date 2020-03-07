@@ -20,7 +20,7 @@ To be back in closed state, either:
 
 Once the circuit breaker is not used, terminate() should be invoked to stop its associated time task.
 
-##Sample Code
+## Sample Code
 Code should look like this:
 
 ```
@@ -37,7 +37,7 @@ loop
 circuitBreaker.terminate();
 ```
 
-##Concurrency
+## Concurrency
 The code has synchronized methods, 2 public and 1 private, with has minimum impact to initial code performance:
   - private synchronized void reset() to reset counters on a regular basis
   - public synchronized void callFailed(long callDuration)
