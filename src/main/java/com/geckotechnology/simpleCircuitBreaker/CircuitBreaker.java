@@ -19,10 +19,6 @@ public class CircuitBreaker {
     		moveToForcedOpenState();
     }
     
-    public CircuitBreakerConfig getCircuitBreakerConfig() {
-    	return circuitBreakerConfig;
-    }
-    
     public synchronized boolean isClosedForThisCall() {
     	return breakerState.isClosedForThisCall();
     }
@@ -34,6 +30,10 @@ public class CircuitBreaker {
     }
     
     //------ Only Private and Default access methods bellow --------------------------
+    
+    CircuitBreakerConfig getCircuitBreakerConfig() {
+    	return circuitBreakerConfig;
+    }
     
     void moveToClosedState() {
     	breakerState = new BreakerClosedState(this);
