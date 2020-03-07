@@ -57,7 +57,7 @@ Where the file `my-breaker.config` contains values to override the default value
 
 ```
 SVC1.failureRateThreshold=20
-SVC1.slidingWindowSize=100
+SVC1.slidingWindowSize=150
 ```
 
 ## Log File
