@@ -1,24 +1,29 @@
 # Simple Circuit Breaker
 
-Simple Circuit Breaker for JAVA 7 and above
-It is inspired by 2 libraries:
-- (A) [Circuit Breaker](https://github.com/hemantksingh/circuit-breaker) by Hemant Kumar
-- (B) [Resilience4j](https://resilience4j.readme.io/docs/circuitbreaker)
+This library is a Simple Circuit Breaker for JAVA 7 and above. It is directly inspired by [Resilience4j](https://resilience4j.readme.io/docs/circuitbreaker) in term of functionality and parameters. Only TIME_BASED sliding window is implemented in the current release.
 
-The circuit breaker can break under 4 conditions:
-- high number of failures or high rate of failures
-- high number of slow transactions or high rate of slow transactions. To calculate rate, a minimum number of transaction calls is required
+It supports the 5 states:
+  - OPEN
+  - CLOSED
+  - HALF-OPEN
+  - DISABLED: broker is always closed (via property slidingWindowSize)
+  - FORCED_OPEN: broker is always opened (via property slidingWindowSize)
 
-The logic is based on a fixed time windows such as (B) [no sliding time window such as (B)]
-where statistics are gathered. When time windows expires, statistics are reset.
-Metrics and thresholds replicate similar logic as in (B).
-There is no half-opened state logic in this implementation.
+![State Machine](./state_machine.jpg)
 
-To be back in closed state, either:
-- wait for current time window to expire and have counter to reset, which could be long or short
-- wait a specified amount of time, then the breaker statistics are reset
 
-Once the circuit breaker is not used, terminate() should be invoked to stop its associated time task.
+The following configuration properties are supported
+
+| Config property | Default Value | Special values |
+| ------------- | ------------- | --------|
+| failureRateThreshold  | 50  | 0 to ignore this threshold |
+| slowCallRateThreshold  | 100 | 0 to ignore this threshold |
+| slowCallDurationThreshold  | 60000 [ms] | 0 to ignore this threshold |
+| permittedNumberOfCallsInHalfOpenState  | 10 | 0 to move from open to closed state directly, without any half-open state |
+| slidingWindowSize  | 100 [s] | 0 for DISABLED state, -1 for FORCED_OPEN |
+| minimumNumberOfCalls  | 10 | |
+| waitDurationInOpenState  | 60000 [ms] | |
+
 
 ## Sample Code
 Code should look like this:
@@ -28,17 +33,85 @@ CircuitBreakerConfig config = new CircuitBreakerConfig();
 config.set...;
 CircuitBreaker circuitBreaker = new CircuitBreaker(config);
 loop
-  if(circuitBreaker.isClosed())
+  if(circuitBreaker.isClosedForThisCall())
     doSomething();
     if success
       circuitBreaker.callSucceeded(doSomething duration);
     else
       circuitBreaker.callFailed(doSomething duration);
-circuitBreaker.terminate();
+```
+
+## Circuit Breaker Configuration
+The circuit breaker can easily be configured using `java.util.Properties`, possibly adding prefix, for example:
+
+```
+Properties properties = new Properties();
+FileInputStream fis = new FileInputStream("my-breaker.config");
+props.load(fis);
+fis.close();
+CircuitBreakerConfig config = new CircuitBreakerConfig("SVC1.", properties);
+CircuitBreaker circuitBreaker = new CircuitBreaker(config);
+```
+
+Where the file `my-breaker.config` contains values to override the default values:
+
+```
+SVC1.slidingWindowSize=100
+SVC1.failureRateThreshold=20
+```
+
+## Log File
+Log file contains information about the breaker state change as well as reason. Here is simple content. Log monitoring can be used to capture events.
+
+```
+Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
+INFO: CircuitBreakerConfig:
+Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
+INFO: 	failureRateThreshold: 55.1
+Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
+INFO: 	slowCallRateThreshold: 40.0
+Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
+INFO: 	slowCallDurationThreshold: 600
+Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
+INFO: 	permittedNumberOfCallsInHalfOpenState: 3
+Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
+INFO: 	slidingWindowSize: 30
+Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
+INFO: 	minimumNumberOfCalls: 6
+Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
+INFO: 	waitDurationOpenedState: 2000
+Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToClosedState
+INFO: Breaker state changed to: CLOSED
+...
+...
+Mar. 07, 2020 6:56:22 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker isExceedFailureOrSlowRateThreshold
+WARNING: High slowCallRate: 66.666664%, slowCallDurationCount: 4, callCount: 6
+Mar. 07, 2020 6:56:22 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToOpenState
+INFO: Breaker state changed to: OPEN
+...
+...
+Mar. 07, 2020 6:56:24 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToHalfOpenState
+INFO: Breaker state changed to: HALF_OPEN
+...
+...
+Mar. 07, 2020 6:56:25 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker isExceedFailureOrSlowRateThreshold
+WARNING: High slowCallRate: 66.666664%, slowCallDurationCount: 2, callCount: 3
+Mar. 07, 2020 6:56:25 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToOpenState
+INFO: Breaker state changed to: OPEN
+...
+...
+Mar. 07, 2020 6:56:27 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToHalfOpenState
+INFO: Breaker state changed to: HALF_OPEN
+...
+...
+Mar. 07, 2020 6:56:29 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToClosedState
+INFO: Breaker state changed to: CLOSED
+...
+...
 ```
 
 ## Concurrency
-The code has synchronized methods, 2 public and 1 private, with has minimum impact to initial code performance:
-  - private synchronized void reset() to reset counters on a regular basis
-  - public synchronized void callFailed(long callDuration)
-  - public synchronized void callSucceeded(long callDuration)
+The code has 3 synchronized methods, so it has minimum impact to initial code performance
+  - `boolean isClosedForThisCall()` to check the state of the breaker for this current call
+  - `void callFailed(long callDuration)` to inform the breaker that the call failed
+  - `void callSucceeded(long callDuration)` to inform the breaker that the call succeeded

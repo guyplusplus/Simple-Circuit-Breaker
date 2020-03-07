@@ -8,12 +8,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
-import com.geckotechnology.simpleCircuitBreaker.CircuitBreaker;
-import com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig;
 
-public class Test1 {
+public class Test2 {
 	
-    private static final Logger logger = Logger.getLogger(Test1.class.getName());
+    private static final Logger logger = Logger.getLogger(Test2.class.getName());
 	private static final long RELOAD_CONFIG_INTERVAL = 5000;
 	private static final Random rd = new Random(System.currentTimeMillis());
 	private static final int NB_THREADS = 5;
@@ -29,16 +27,16 @@ public class Test1 {
 //			public void run() {
 //				new Test1().test(
 //						"AIS_Prepaid.",
-//						"C:\\Data\\Simple-Circuit-Breaker\\src\\test\\java\\com\\geckotechnology\\simpleCircuitBreaker\\breaker1.config"
+//						"C:\\Data\\Simple-Circuit-Breaker\\src\\test\\java\\com\\geckotechnology\\simpleCircuitBreaker\\breaker3.config"
 //						);				
 //			}
 //		}.start();
 		new Thread() {
 			@Override
 			public void run() {
-				new Test1().test(
+				new Test2().test(
 						null,
-						"C:\\Data\\Simple-Circuit-Breaker\\src\\test\\java\\com\\geckotechnology\\simpleCircuitBreaker\\breaker2.config"
+						"C:\\Data\\Simple-Circuit-Breaker\\src\\test\\java\\com\\geckotechnology\\simpleCircuitBreaker\\breaker4.config"
 						);				
 			}
 		}.start();
@@ -59,8 +57,6 @@ public class Test1 {
 				e.printStackTrace();
 				config = new CircuitBreakerConfig();
 			}
-			if(circuitBreaker != null)
-				circuitBreaker.terminate();
 			circuitBreaker = new CircuitBreaker(config);
 			if(lastConfigLoadedTime == 0) {
 		    	new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -83,7 +79,7 @@ public class Test1 {
 				@Override
 				public void run() {
 					while(true) {
-						if(circuitBreaker.isClosed()) {
+						if(circuitBreaker.isClosedForThisCall()) {
 							boolean willFail = (rd.nextInt(1000) > 700);
 							if(willFail) {
 								long duration = 10;

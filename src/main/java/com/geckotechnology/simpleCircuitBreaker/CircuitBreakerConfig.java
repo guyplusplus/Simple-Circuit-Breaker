@@ -18,14 +18,13 @@ public class CircuitBreakerConfig {
 	
     private static final Logger logger = Logger.getLogger(CircuitBreakerConfig.class.getName());
     
-	private long resetInterval = 30000;
-	private int failureCountThreshold = 0;
-	private long slowCallDurationThreshold = 30000;
-	private int slowCallCountThreshold = 0;
-	private int minimumNumberOfCalls = 10;
 	private float failureRateThreshold = 50;
 	private float slowCallRateThreshold = 100;
-	private long waitDurationOpenedState = 30000;
+	private long slowCallDurationThreshold = 60000;
+	private int permittedNumberOfCallsInHalfOpenState = 10;
+	private int slidingWindowSize = 100;
+	private int minimumNumberOfCalls = 10;
+	private long waitDurationOpenedState = 60000;
 	
 	/**
 	 * Default constructor with default values
@@ -44,27 +43,24 @@ public class CircuitBreakerConfig {
 		if(prefix == null)
 			prefix = "";
 		String value = null;
-		value = props.getProperty(prefix + "resetInterval");
-		if(value != null)
-			setResetInterval(Long.parseLong(value));
-		value = props.getProperty(prefix + "failureCountThreshold");
-		if(value != null)
-			setFailureCountThreshold(Integer.parseInt(value));
-		value = props.getProperty(prefix + "slowCallDurationThreshold");
-		if(value != null)
-			setSlowCallDurationThreshold(Long.parseLong(value));
-		value = props.getProperty(prefix + "slowCallCountThreshold");
-		if(value != null)
-			setSlowCallCountThreshold(Integer.parseInt(value));
-		value = props.getProperty(prefix + "minimumNumberOfCalls");
-		if(value != null)
-			setMinimumNumberOfCalls(Integer.parseInt(value));
 		value = props.getProperty(prefix + "failureRateThreshold");
 		if(value != null)
 			setFailureRateThreshold(Float.parseFloat(value));
 		value = props.getProperty(prefix + "slowCallRateThreshold");
 		if(value != null)
 			setSlowCallRateThreshold(Float.parseFloat(value));
+		value = props.getProperty(prefix + "slowCallDurationThreshold");
+		if(value != null)
+			setSlowCallDurationThreshold(Long.parseLong(value));
+		value = props.getProperty(prefix + "permittedNumberOfCallsInHalfOpenState");
+		if(value != null)
+			setPermittedNumberOfCallsInHalfOpenState(Integer.parseInt(value));
+		value = props.getProperty(prefix + "slidingWindowSize");
+		if(value != null)
+			setSlidingWindowSize(Integer.parseInt(value));
+		value = props.getProperty(prefix + "minimumNumberOfCalls");
+		if(value != null)
+			setMinimumNumberOfCalls(Integer.parseInt(value));
 		value = props.getProperty(prefix + "waitDurationOpenedState");
 		if(value != null)
 			setWaitDurationOpenedState(Long.parseLong(value));
@@ -72,10 +68,9 @@ public class CircuitBreakerConfig {
 		
 	public CircuitBreakerConfig clone() {
 		CircuitBreakerConfig clone = new CircuitBreakerConfig();
-		clone.resetInterval = resetInterval;
-		clone.failureCountThreshold = failureCountThreshold;
+		clone.slidingWindowSize = slidingWindowSize;
+		clone.permittedNumberOfCallsInHalfOpenState = permittedNumberOfCallsInHalfOpenState;
 		clone.slowCallDurationThreshold = slowCallDurationThreshold;
-		clone.slowCallCountThreshold = slowCallCountThreshold;
 		clone.minimumNumberOfCalls = minimumNumberOfCalls;
 		clone.failureRateThreshold = failureRateThreshold;
 		clone.slowCallRateThreshold = slowCallRateThreshold;
@@ -85,36 +80,25 @@ public class CircuitBreakerConfig {
 	
 	public void logInfoConfigProperties() {
 		logger.info("CircuitBreakerConfig:");
-		logger.info("\tresetInterval: " + resetInterval);
-		logger.info("\tfailureCountThreshold: " + failureCountThreshold);
-		logger.info("\tslowCallDurationThreshold: " + slowCallDurationThreshold);
-		logger.info("\tslowCallCountThreshold: " + slowCallCountThreshold);
-		logger.info("\tminimumNumberOfCalls: " + minimumNumberOfCalls);
 		logger.info("\tfailureRateThreshold: " + failureRateThreshold);
 		logger.info("\tslowCallRateThreshold: " + slowCallRateThreshold);
+		logger.info("\tslowCallDurationThreshold: " + slowCallDurationThreshold);
+		logger.info("\tpermittedNumberOfCallsInHalfOpenState: " + permittedNumberOfCallsInHalfOpenState);
+		logger.info("\tslidingWindowSize: " + slidingWindowSize);
+		logger.info("\tminimumNumberOfCalls: " + minimumNumberOfCalls);
 		logger.info("\twaitDurationOpenedState: " + waitDurationOpenedState);
 	}
 	
-	public long getResetInterval() {
-		return resetInterval;
+	public int getSlidingWindowSize() {
+		return slidingWindowSize;
 	}
 	
-	public void setResetInterval(long resetInterval) {
-		if(resetInterval < 0)
-			throw new IllegalArgumentException("resetInterval must be positive or null");
-		this.resetInterval = resetInterval;
+	public void setSlidingWindowSize(int slidingWindow) {
+		if(slidingWindow < 0 && slidingWindow != -1)
+			throw new IllegalArgumentException("slidingWindow must be positive or 0 (closed state) or -1 (open state)");
+		this.slidingWindowSize = slidingWindow;
 	}
 	
-	public int getFailureCountThreshold() {
-		return failureCountThreshold;
-	}
-
-	public void setFailureCountThreshold(int failureCountThreshold) {
-		if(failureCountThreshold < 0)
-			throw new IllegalArgumentException("failureCountThreshold must be positive or null");
-		this.failureCountThreshold = failureCountThreshold;
-	}
-
 	public long getSlowCallDurationThreshold() {
 		return slowCallDurationThreshold;
 	}
@@ -125,23 +109,13 @@ public class CircuitBreakerConfig {
 		this.slowCallDurationThreshold = slowCallDurationThreshold;
 	}
 
-	public int getSlowCallCountThreshold() {
-		return slowCallCountThreshold;
-	}
-
-	public void setSlowCallCountThreshold(int slowCallCountThreshold) {
-		if(slowCallCountThreshold < 0)
-			throw new IllegalArgumentException("slowCallCountThreshold must be positive or null");
-		this.slowCallCountThreshold = slowCallCountThreshold;
-	}
-
 	public int getMinimumNumberOfCalls() {
 		return minimumNumberOfCalls;
 	}
 
 	public void setMinimumNumberOfCalls(int minimumNumberOfCalls) {
-		if(minimumNumberOfCalls < 0)
-			throw new IllegalArgumentException("minimumNumberOfCalls must be positive or null");
+		if(minimumNumberOfCalls <= 0)
+			throw new IllegalArgumentException("minimumNumberOfCalls must be positive");
 		this.minimumNumberOfCalls = minimumNumberOfCalls;
 	}
 
@@ -170,9 +144,19 @@ public class CircuitBreakerConfig {
 	}
 
 	public void setWaitDurationOpenedState(long waitDurationOpenedState) {
-		if(waitDurationOpenedState < 0)
-			throw new IllegalArgumentException("waitDurationOpenedState must be positive or null");
+		if(waitDurationOpenedState <= 0)
+			throw new IllegalArgumentException("waitDurationOpenedState must be positive");
 		this.waitDurationOpenedState = waitDurationOpenedState;
+	}
+
+	public int getPermittedNumberOfCallsInHalfOpenState() {
+		return permittedNumberOfCallsInHalfOpenState;
+	}
+
+	public void setPermittedNumberOfCallsInHalfOpenState(int permittedNumberOfCallsInHalfOpenState) {
+		if(permittedNumberOfCallsInHalfOpenState < 0)
+			throw new IllegalArgumentException("permittedNumberOfCallsInHalfOpenState must be positive or null");
+		this.permittedNumberOfCallsInHalfOpenState = permittedNumberOfCallsInHalfOpenState;
 	}
 
 }
