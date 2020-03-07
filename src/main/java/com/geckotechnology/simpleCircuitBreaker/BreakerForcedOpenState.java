@@ -2,7 +2,6 @@ package com.geckotechnology.simpleCircuitBreaker;
 
 class BreakerForcedOpenState implements CircuitBreakerStateInterface {
 
-	
 	BreakerForcedOpenState(CircuitBreaker circuitBreaker) {
 	}
 	

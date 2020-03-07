@@ -3,17 +3,6 @@ package com.geckotechnology.simpleCircuitBreaker;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-/**
- * resetInterval (default 30000, in ms): how frequent the breaker resets itself its statistics and back to closed state. If set to 0, the breaker is inactive
- * failureCountThreshold (default 0, failureRateThreshold is preferred): the number of call failures required to open the breaker. If set to 0, no logic is applied.
- * slowCallDurationThreshold (default 30000, in ms): the duration of a call to be considered to be slow. If set to 0, no logic is applied. 
- * slowCallCountThreshold (default 0, slowCallRateThreshold is preferred): the number of slow calls required to open the breaker. If set to 0, no logic is applied.
- * minimumNumberOfCalls (default 10): the number of calls required to apply rateThreshold logic (failureRateThreshold and slowCallRateThreshold). If set to 0, no logic is applied.
- * failureRateThreshold (default 50): rate failures / total calls above which the breaker opens. It is a float 0 to 100. If set to 0, no logic is applied.
- * slowCallRateThreshold (default 100): rate slow / total calls above which the breaker opens. It is a float 0 to 100. If set to 0, no logic is applied.
- * waitDurationOpenedState (default 30000, in ms): time until breaker is reset to closed after being opened. If set to 0, breaker resets at next resetInterval
- *
- */
 public class CircuitBreakerConfig {
 	
     private static final Logger logger = Logger.getLogger(CircuitBreakerConfig.class.getName());
@@ -93,10 +82,10 @@ public class CircuitBreakerConfig {
 		return slidingWindowSize;
 	}
 	
-	public void setSlidingWindowSize(int slidingWindow) {
-		if(slidingWindow < 0 && slidingWindow != -1)
+	public void setSlidingWindowSize(int slidingWindowSize) {
+		if(slidingWindowSize < 0 && slidingWindowSize != -1)
 			throw new IllegalArgumentException("slidingWindow must be positive or 0 (closed state) or -1 (open state)");
-		this.slidingWindowSize = slidingWindow;
+		this.slidingWindowSize = slidingWindowSize;
 	}
 	
 	public long getSlowCallDurationThreshold() {
