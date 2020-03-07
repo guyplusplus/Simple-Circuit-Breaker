@@ -56,8 +56,8 @@ CircuitBreaker circuitBreaker = new CircuitBreaker(config);
 Where the file `my-breaker.config` contains values to override the default values:
 
 ```
-SVC1.slidingWindowSize=100
 SVC1.failureRateThreshold=20
+SVC1.slidingWindowSize=100
 ```
 
 ## Log File
