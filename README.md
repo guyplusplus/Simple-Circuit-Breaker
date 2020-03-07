@@ -111,7 +111,7 @@ INFO: Breaker state changed to: CLOSED
 ```
 
 ## Concurrency
-The code has 3 synchronized methods, so it has minimum impact to initial code performance
+The code has 3 synchronized methods, it has minimum impact to initial code performance. Actual business logic is not included in the synchronized, so blocking time is minimum
   - `boolean isClosedForThisCall()` to check the state of the breaker for this current call
   - `void callFailed(long callDuration)` to inform the breaker that the call failed
   - `void callSucceeded(long callDuration)` to inform the breaker that the call succeeded
