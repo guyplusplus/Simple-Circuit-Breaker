@@ -1,7 +1,10 @@
 package com.geckotechnology.simpleCircuitBreaker;
 
+import java.util.logging.Logger;
+
 class BreakerHalfOpenState implements CircuitBreakerStateInterface {
 
+    private static final Logger logger = Logger.getLogger(BreakerHalfOpenState.class.getName());
 	private final CircuitBreaker circuitBreaker;
     private int callCount = 0;
     private int failureCallCount = 0;
@@ -43,7 +46,9 @@ class BreakerHalfOpenState implements CircuitBreakerStateInterface {
     	//time to see if any threshold is exceeded. If yes, go to open state. If no, go to closed state
     	if(circuitBreaker.isExceedFailureOrSlowRateThreshold(callCount, failureCallCount, slowCallDurationCount))
     		circuitBreaker.moveToOpenState();
-    	else
+    	else {
+    		logger.info("callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
     		circuitBreaker.moveToClosedState();
+    	}
     }
 }
