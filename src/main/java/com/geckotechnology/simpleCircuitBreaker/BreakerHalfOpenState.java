@@ -43,7 +43,9 @@ class BreakerHalfOpenState implements BreakerStateInterface {
     	if(callCount < circuitBreaker.getCircuitBreakerConfig().getPermittedNumberOfCallsInHalfOpenState())
     		return;
     	//callCount reaches permittedNumberOfCallsInHalfOpenState
-    	//time to see if any threshold is exceeded. If yes, go to open state. If no, go to closed state
+    	//Time to see if any threshold is exceeded:
+    	//  If yes, go to open state
+    	//  If no, go to closed state
     	if(circuitBreaker.isExceedFailureOrSlowRateThreshold(callCount, failureCallCount, slowCallDurationCount))
     		circuitBreaker.moveToOpenState();
     	else {
