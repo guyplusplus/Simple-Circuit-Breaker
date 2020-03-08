@@ -41,7 +41,7 @@ loop
       circuitBreaker.callFailed(doSomething duration);
 ```
 
-**`callSucceeded()` or `callFailed()` must always be invoked after `isClosedForThisCall()`. Otherwise breaker in HALF-OPEN state will never move to another state.**
+**Important: `callSucceeded()` or `callFailed()` must always be invoked after `isClosedForThisCall()`. Otherwise breaker in HALF-OPEN state will never move to another state.**
 
 ## Circuit Breaker Configuration using Properties
 The circuit breaker can easily be configured using `java.util.Properties`, possibly adding prefix, for example:
