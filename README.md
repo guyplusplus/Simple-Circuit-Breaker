@@ -41,10 +41,12 @@ loop
       circuitBreaker.callFailed(doSomething duration);
 ```
 
+**`callSucceeded()` or `callFailed()` must always be invoked after `isClosedForThisCall()`. Otherwise breaker in HALF-OPEN state will never move to another state.**
+
 ## Circuit Breaker Configuration using Properties
 The circuit breaker can easily be configured using `java.util.Properties`, possibly adding prefix, for example:
 
-```
+```java
 Properties properties = new Properties();
 FileInputStream fis = new FileInputStream("my-breaker.config");
 props.load(fis);
@@ -113,7 +115,7 @@ INFO: Breaker state changed to: CLOSED
 ```
 
 ## Concurrency
-The code has 3 synchronized methods, it has minimum impact to initial code performance. Actual business logic is not included in the synchronized, so blocking time is minimum
+The code has 3 synchronized methods, it has minimum impact to initial code performance. Actual business logic is not included in the synchronized code, so blocking time is minimum
   - `boolean isClosedForThisCall()` to check the state of the breaker for this current call
   - `void callFailed(long callDuration)` to inform the breaker that the call failed
   - `void callSucceeded(long callDuration)` to inform the breaker that the call succeeded
