@@ -12,7 +12,7 @@ class BreakerOpenState implements BreakerStateInterface {
 	
 	@Override
 	public boolean isClosedForThisCall() {
-		//check if need to move to hald-open
+		//check if need to move to half-open
 		if(System.currentTimeMillis() >= openStateEndTimestamp) {
 			if(circuitBreaker.getCircuitBreakerConfig().getPermittedNumberOfCallsInHalfOpenState() == 0)
 				circuitBreaker.moveToClosedState();

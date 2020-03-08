@@ -5,7 +5,7 @@ This library is a Simple Circuit Breaker for JAVA 7 and above. It is directly in
 It supports the 5 states:
   - OPEN
   - CLOSED
-  - HALF-OPEN
+  - HALF_OPEN
   - DISABLED: broker is always closed (via property slidingWindowSize)
   - FORCED_OPEN: broker is always opened (via property slidingWindowSize)
 
@@ -24,7 +24,7 @@ maxDurationOpenInHalfOpenState is a new property described in the sample code pa
 | slidingWindowSize  | 100 [s] | 0 to set breaker in DISABLED state, -1 to set breaker in FORCED_OPEN state |
 | minimumNumberOfCalls  | 10 | |
 | waitDurationInOpenState  | 60000 [ms] | |
-| maxDurationOpenInHalfOpenState | 120000 [ms] | If set to 0, there is no limit |
+| maxDurationOpenInHalfOpenState | 120000 [ms] | If set to 0, the breaker in HALF_OPEN state will wait forever for the outcome (fail or success) of all the permittedNumberOfCallsInHalfOpenState calls |
 
 
 ## Sample Code
@@ -43,9 +43,9 @@ loop
       circuitBreaker.callFailed(doSomething duration);
 ```
 
-**Important**: `callSucceeded()` or `callFailed()` must always be invoked after `isClosedForThisCall()`. Otherwise breaker in HALF-OPEN state will never move to another state, waiting for the results of the permittedNumberOfCallsInHalfOpenState calls.
+**Important**: `callSucceeded()` or `callFailed()` must always be invoked after `isClosedForThisCall()`. Otherwise breaker in HALF_OPEN state will never move to another state, waiting for the results of the permittedNumberOfCallsInHalfOpenState calls.
 
-To avoid this situation a new property called maxDurationOpenInHalfOpenState is introduced. In HALF-OPEN state, after permittedNumberOfCallsInHalfOpenState calls (`isClosedForThisCall()` returns true), all its subsequent calls (`isClosedForThisCall()` returns false) should not be executed as the circuit is opened. If this situation lasts longer than maxDurationOpenInHalfOpenState ms, the breaker goes back automatically to the CLOSED state.
+To avoid this situation a new property called maxDurationOpenInHalfOpenState is introduced. In HALF_OPEN state, after permittedNumberOfCallsInHalfOpenState calls (`isClosedForThisCall()` returns true), all its subsequent calls (`isClosedForThisCall()` returns false) should not be executed as the circuit is opened. If this situation lasts longer than maxDurationOpenInHalfOpenState ms, the breaker goes back automatically to the CLOSED state.
 
 ## Circuit Breaker Configuration using Properties
 The circuit breaker can easily be configured using `java.util.Properties`, possibly adding prefix, for example:

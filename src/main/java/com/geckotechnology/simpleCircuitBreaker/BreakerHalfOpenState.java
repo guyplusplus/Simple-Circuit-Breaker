@@ -38,7 +38,7 @@ class BreakerHalfOpenState implements BreakerStateInterface {
     		circuitBreaker.moveToClosedState();
     		return circuitBreaker.isClosedForThisCall();
 		}
-		//situation normal, no more calls allowed
+		//situation normal, no more call allowed
 		return false;
 	}
 
