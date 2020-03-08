@@ -10,6 +10,7 @@ class BreakerHalfOpenState implements BreakerStateInterface {
     private int failureCallCount = 0;
     private int slowCallDurationCount = 0;
     private int permittedNumberOfCallsInHalfOpenStateSoFar = 0;
+    private long lastOpenCallTimeLimit = 0;
 	
 	BreakerHalfOpenState(CircuitBreaker circuitBreaker) {
 		this.circuitBreaker = circuitBreaker;
@@ -17,12 +18,28 @@ class BreakerHalfOpenState implements BreakerStateInterface {
 	
 	@Override
 	public boolean isClosedForThisCall() {
+		//ensure permittedNumberOfCallsInHalfOpenState calls are executed, by returning true
 		if(permittedNumberOfCallsInHalfOpenStateSoFar < circuitBreaker.getCircuitBreakerConfig().getPermittedNumberOfCallsInHalfOpenState()) {
 			permittedNumberOfCallsInHalfOpenStateSoFar++;
 			return true;
 		}
+		//no more calls allowed
+		//if maxDurationOpenInHalfOpenState is 0, this situation can last forever. Return false 
+		if(circuitBreaker.getCircuitBreakerConfig().getMaxDurationOpenInHalfOpenState() == 0)
+			return false;
+		//There is a time  limit. Check if it is set. If not, it is the first call. Return false
+		if(lastOpenCallTimeLimit == 0) {
+			lastOpenCallTimeLimit = System.currentTimeMillis() + circuitBreaker.getCircuitBreakerConfig().getMaxDurationOpenInHalfOpenState();
+			return false;
+		}
+		if(System.currentTimeMillis() >= lastOpenCallTimeLimit) {
+			//we are beyond maxDurationOpenInHalfOpenState. Need to go back to CLOSED state
+    		logger.warning("maxDurationOpenInHalfOpenState is reached. CallCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
+    		circuitBreaker.moveToClosedState();
+    		return circuitBreaker.isClosedForThisCall();
+		}
+		//situation normal, no more calls allowed
 		return false;
-		//@TODO add logic so that half open state is not for ever
 	}
 
 	@Override

@@ -14,6 +14,7 @@ public class CircuitBreakerConfig {
 	private int slidingWindowSize = 100;
 	private int minimumNumberOfCalls = 10;
 	private long waitDurationOpenedState = 60000;
+	private long maxDurationOpenInHalfOpenState = 120000;
 	
 	/**
 	 * Default constructor with default values
@@ -53,6 +54,9 @@ public class CircuitBreakerConfig {
 		value = props.getProperty(prefix + "waitDurationOpenedState");
 		if(value != null)
 			setWaitDurationOpenedState(Long.parseLong(value));
+		value = props.getProperty(prefix + "maxDurationOpenInHalfOpenState");
+		if(value != null)
+			setMaxDurationOpenInHalfOpenState(Long.parseLong(value));
 	}
 		
 	public CircuitBreakerConfig clone() {
@@ -64,6 +68,7 @@ public class CircuitBreakerConfig {
 		clone.failureRateThreshold = failureRateThreshold;
 		clone.slowCallRateThreshold = slowCallRateThreshold;
 		clone.waitDurationOpenedState = waitDurationOpenedState;
+		clone.maxDurationOpenInHalfOpenState = maxDurationOpenInHalfOpenState;
 		return clone;
 	}
 	
@@ -76,6 +81,7 @@ public class CircuitBreakerConfig {
 		logger.info("\tslidingWindowSize: " + slidingWindowSize);
 		logger.info("\tminimumNumberOfCalls: " + minimumNumberOfCalls);
 		logger.info("\twaitDurationOpenedState: " + waitDurationOpenedState);
+		logger.info("\tmaxDurationOpenInHalfOpenState: " + maxDurationOpenInHalfOpenState);
 	}
 	
 	public int getSlidingWindowSize() {
@@ -146,6 +152,16 @@ public class CircuitBreakerConfig {
 		if(permittedNumberOfCallsInHalfOpenState < 0)
 			throw new IllegalArgumentException("permittedNumberOfCallsInHalfOpenState must be positive or null");
 		this.permittedNumberOfCallsInHalfOpenState = permittedNumberOfCallsInHalfOpenState;
+	}
+
+	public long getMaxDurationOpenInHalfOpenState() {
+		return maxDurationOpenInHalfOpenState;
+	}
+
+	public void setMaxDurationOpenInHalfOpenState(long maxDurationOpenInHalfOpenState) {
+		if(maxDurationOpenInHalfOpenState < 0)
+			throw new IllegalArgumentException("maxDurationOpenInHalfOpenState must be positive or null");
+		this.maxDurationOpenInHalfOpenState = maxDurationOpenInHalfOpenState;
 	}
 
 }

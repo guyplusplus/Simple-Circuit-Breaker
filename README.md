@@ -12,7 +12,8 @@ It supports the 5 states:
 ![State Machine](./state_machine.jpg)
 
 
-The following configuration properties are supported
+The following Resilience4j configuration properties are supported.
+maxDurationOpenInHalfOpenState is a new property described in the sample code paragraph.
 
 | Config property | Default Value | Special Values |
 | ------------- | ------------- | --------|
@@ -23,6 +24,7 @@ The following configuration properties are supported
 | slidingWindowSize  | 100 [s] | 0 to set breaker in DISABLED state, -1 to set breaker in FORCED_OPEN state |
 | minimumNumberOfCalls  | 10 | |
 | waitDurationInOpenState  | 60000 [ms] | |
+| maxDurationOpenInHalfOpenState | 120000 [ms] | If set to 0, there is no limit |
 
 
 ## Sample Code
@@ -41,7 +43,9 @@ loop
       circuitBreaker.callFailed(doSomething duration);
 ```
 
-**Important: `callSucceeded()` or `callFailed()` must always be invoked after `isClosedForThisCall()`. Otherwise breaker in HALF-OPEN state will never move to another state.**
+**Important**: `callSucceeded()` or `callFailed()` must always be invoked after `isClosedForThisCall()`. Otherwise breaker in HALF-OPEN state will never move to another state, waiting for the results of the permittedNumberOfCallsInHalfOpenState calls.
+
+To avoid this situation a new property maxDurationOpenInHalfOpenState is introduced. In HALF-OPEN state, after permittedNumberOfCallsInHalfOpenState calls (`isClosedForThisCall()` returns true), all its subsequent calls (`isClosedForThisCall()` returns false) won't be executed as the circuit is opened. If this situation lasts longer than maxDurationOpenInHalfOpenState ms, the breaker goes back automatically to the CLOSED state.
 
 ## Circuit Breaker Configuration using Properties
 The circuit breaker can easily be configured using `java.util.Properties`, possibly adding prefix, for example:
