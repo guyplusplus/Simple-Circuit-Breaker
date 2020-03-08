@@ -99,9 +99,10 @@ class BreakerClosedState implements BreakerStateInterface {
     }
     
     /**
-     * Method used during development to validate array and sum are correctly aligned
+     * Method used during unit test to validate array and sum are correctly aligned. If not, code exists
+     * Method is not synchronized
      */
-    private void testCheckSum() {
+    void testCheckSumForUnitTest() {
         int checkCallCount = 0;
         int checkFailureCallCount = 0;
         int checkSlowCallDurationCount = 0;

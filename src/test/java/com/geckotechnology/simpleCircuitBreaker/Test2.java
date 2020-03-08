@@ -79,6 +79,12 @@ public class Test2 {
 				@Override
 				public void run() {
 					while(true) {
+						synchronized (circuitBreaker) {
+							BreakerStateInterface breakerState = circuitBreaker.getBreakerState();
+							if(breakerState instanceof BreakerClosedState) {
+								((BreakerClosedState) breakerState).testCheckSumForUnitTest();
+							}
+						}
 						if(circuitBreaker.isClosedForThisCall()) {
 							boolean willFail = (rd.nextInt(1000) > 700);
 							if(willFail) {

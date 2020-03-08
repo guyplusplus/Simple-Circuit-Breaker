@@ -35,6 +35,14 @@ public class CircuitBreaker {
     	return circuitBreakerConfig;
     }
     
+    /**
+     * Used for unit test. Method is not synchronized
+     * @return current state object of the breaker
+     */
+    BreakerStateInterface getBreakerState() {
+    	return breakerState;
+    }
+    
     void moveToClosedState() {
     	breakerState = new BreakerClosedState(this);
     	logger.info("Breaker state changed to: CLOSED");
