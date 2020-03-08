@@ -98,7 +98,6 @@ public class Test2 {
 								try {
 									Thread.sleep(duration);
 								} catch (InterruptedException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 								circuitBreaker.callSucceeded(duration);
@@ -110,7 +109,6 @@ public class Test2 {
 						try {
 							Thread.sleep(500);
 						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
