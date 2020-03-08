@@ -99,22 +99,22 @@ class BreakerClosedState implements BreakerStateInterface {
     }
     
     /**
-     * Method used during development to validate array and sum are correctly alligned
+     * Method used during development to validate array and sum are correctly aligned
      */
     private void testCheckSum() {
-        int aCallCount = 0;
-        int aFailureCallCount = 0;
-        int aSlowCallDurationCount = 0;
+        int checkCallCount = 0;
+        int checkFailureCallCount = 0;
+        int checkSlowCallDurationCount = 0;
     	for(int i = 0; i<slidingWindowSize; i++) {
-    		aCallCount += callCountBuckets[i];
-    		aFailureCallCount += failureCallCountBuckets[i];
-    		aSlowCallDurationCount += slowCallDurationCountBuckets[i];
+    		checkCallCount += callCountBuckets[i];
+    		checkFailureCallCount += failureCallCountBuckets[i];
+    		checkSlowCallDurationCount += slowCallDurationCountBuckets[i];
     	}
-    	if(aCallCount != callCount ||
-    			aFailureCallCount != failureCallCount ||
-    			aSlowCallDurationCount != slowCallDurationCount) {
+    	if(checkCallCount != callCount ||
+    			checkFailureCallCount != failureCallCount ||
+    			checkSlowCallDurationCount != slowCallDurationCount) {
     		System.out.println("incremental callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
-    		System.out.println("calculated  callCount: " + aCallCount + ", failureCallCount: " + aFailureCallCount + ", slowCallDurationCount: " + aSlowCallDurationCount);
+    		System.out.println("calculated  callCount: " + checkCallCount + ", failureCallCount: " + checkFailureCallCount + ", slowCallDurationCount: " + checkSlowCallDurationCount);
     		System.exit(1);
     	}
     }
