@@ -45,7 +45,7 @@ loop
 
 **Important**: `callSucceeded()` or `callFailed()` must always be invoked after `isClosedForThisCall()`. Otherwise breaker in HALF-OPEN state will never move to another state, waiting for the results of the permittedNumberOfCallsInHalfOpenState calls.
 
-To avoid this situation a new property maxDurationOpenInHalfOpenState is introduced. In HALF-OPEN state, after permittedNumberOfCallsInHalfOpenState calls (`isClosedForThisCall()` returns true), all its subsequent calls (`isClosedForThisCall()` returns false) won't be executed as the circuit is opened. If this situation lasts longer than maxDurationOpenInHalfOpenState ms, the breaker goes back automatically to the CLOSED state.
+To avoid this situation a new property called maxDurationOpenInHalfOpenState is introduced. In HALF-OPEN state, after permittedNumberOfCallsInHalfOpenState calls (`isClosedForThisCall()` returns true), all its subsequent calls (`isClosedForThisCall()` returns false) should not be executed as the circuit is opened. If this situation lasts longer than maxDurationOpenInHalfOpenState ms, the breaker goes back automatically to the CLOSED state.
 
 ## Circuit Breaker Configuration using Properties
 The circuit breaker can easily be configured using `java.util.Properties`, possibly adding prefix, for example:
@@ -66,8 +66,14 @@ SVC1.failureRateThreshold=20
 SVC1.slidingWindowSize=150
 ```
 
-## Log File
-Log file contains information about the breaker state change as well as reason. Here is simple content. Log monitoring can be used to capture events.
+## Concurrency
+The code has 3 synchronized methods, it has minimum impact to initial code performance. Actual business logic is not included in the synchronized code, so blocking time is minimum
+  - `boolean isClosedForThisCall()` to check the state of the breaker for this current call
+  - `void callFailed(long callDuration)` to inform the breaker that the call failed
+  - `void callSucceeded(long callDuration)` to inform the breaker that the call succeeded
+
+## Log File Output
+Log file contains information about the breaker state change as well as the reason and simple statistics. Here is simple content. Log monitoring can be used to capture events.
 
 ```
 Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
@@ -118,8 +124,30 @@ INFO: Breaker state changed to: CLOSED
 ...
 ```
 
-## Concurrency
-The code has 3 synchronized methods, it has minimum impact to initial code performance. Actual business logic is not included in the synchronized code, so blocking time is minimum
-  - `boolean isClosedForThisCall()` to check the state of the breaker for this current call
-  - `void callFailed(long callDuration)` to inform the breaker that the call failed
-  - `void callSucceeded(long callDuration)` to inform the breaker that the call succeeded
+Another example showing the behavior of maxDurationOpenInHalfOpenState.
+
+```
+...
+...
+Mar. 08, 2020 5:02:27 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToClosedState
+INFO: Breaker state changed to: CLOSED
+...
+...
+Mar. 08, 2020 5:02:52 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker isExceedFailureOrSlowRateThreshold
+WARNING: High slowCallRate: 45.299145%, slowCallDurationCount: 53, callCount: 117
+Mar. 08, 2020 5:02:52 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToOpenState
+INFO: Breaker state changed to: OPEN
+...
+...
+Mar. 08, 2020 5:02:54 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToHalfOpenState
+INFO: Breaker state changed to: HALF_OPEN
+...
+...
+Mar. 08, 2020 5:02:55 PM com.geckotechnology.simpleCircuitBreaker.BreakerHalfOpenState isClosedForThisCall
+WARNING: maxDurationOpenInHalfOpenState is reached. CallCount: 4, failureCallCount: 1, slowCallDurationCount: 1
+Mar. 08, 2020 5:02:55 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToClosedState
+INFO: Breaker state changed to: CLOSED
+...
+...
+```
+
