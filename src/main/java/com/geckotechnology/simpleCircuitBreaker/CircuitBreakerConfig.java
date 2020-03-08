@@ -23,6 +23,13 @@ public class CircuitBreakerConfig {
 	}
 	
 	/**
+	 * Constructor where prefix is empty
+	 */
+	public CircuitBreakerConfig(Properties props) {
+		this(null, props);
+	}
+	
+	/**
 	 * Constructor where props contains some key/value pairs to override default values. Prefix can be provided
 	 * so that one properties object can contain multiple breaker configurations. So for example if prefix is "breaker1.",
 	 * property "breaker1.resetInterval" will be checked.
