@@ -6,8 +6,8 @@ It supports the 5 states:
   - OPEN
   - CLOSED
   - HALF_OPEN
-  - DISABLED: broker is always closed (via property slidingWindowSize)
-  - FORCED_OPEN: broker is always opened (via property slidingWindowSize)
+  - DISABLED: broker is always closed (via property slidingWindowSize set to 0)
+  - FORCED_OPEN: broker is always opened (via property slidingWindowSize set to -1)
 
 ![State Machine](./state_machine.jpg)
 
