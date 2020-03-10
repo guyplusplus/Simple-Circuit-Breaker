@@ -83,9 +83,11 @@ public class OverheadTest {
 				fail("InterruptedException catched: " + e);
 			}
 		//summary
-		double overHead = durationPerCallWithBreakerHolder.getDoubleAverage() - durationPerCallNoBreakerHolder.getDoubleAverage();
-		System.out.println("duration (ms) per oneCall - NO BREAKER: " + durationPerCallNoBreakerHolder.getDoubleAverage());
-		System.out.println("duration (ms) per oneCall - WITH BREAKER: " + durationPerCallWithBreakerHolder.getDoubleAverage());
+		double durationPerCallNoBreaker = durationPerCallNoBreakerHolder.getDoubleAverage();
+		double durationPerCallWithBreaker = durationPerCallWithBreakerHolder.getDoubleAverage();
+		double overHead = durationPerCallWithBreaker - durationPerCallNoBreaker;
+		System.out.println("duration (ms) per oneCall - NO BREAKER: " + durationPerCallNoBreaker);
+		System.out.println("duration (ms) per oneCall - WITH BREAKER: " + durationPerCallWithBreaker);
 		System.out.println("Overhead (ms) per oneCall of breaker: " + overHead);
 		assertTrue(overHead < 0.1);
 	}
