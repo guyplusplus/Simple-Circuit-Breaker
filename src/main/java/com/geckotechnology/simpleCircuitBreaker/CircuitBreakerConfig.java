@@ -7,7 +7,8 @@ public class CircuitBreakerConfig {
 	
     private static final Logger logger = Logger.getLogger(CircuitBreakerConfig.class.getName());
     
-	private float failureRateThreshold = 50;
+    private String name = null;
+    private float failureRateThreshold = 50;
 	private float slowCallRateThreshold = 100;
 	private long slowCallDurationThreshold = 60000;
 	private int permittedNumberOfCallsInHalfOpenState = 10;
@@ -15,7 +16,9 @@ public class CircuitBreakerConfig {
 	private int minimumNumberOfCalls = 10;
 	private long waitDurationOpenedState = 60000;
 	private long maxDurationOpenInHalfOpenState = 120000;
-	
+
+    private String nameLogPrefix = "";
+
 	/**
 	 * Default constructor with default values
 	 */
@@ -40,6 +43,9 @@ public class CircuitBreakerConfig {
 		if(prefix == null)
 			prefix = "";
 		String value = null;
+		value = props.getProperty(prefix + "name");
+		if(value != null)
+			setName(value);
 		value = props.getProperty(prefix + "failureRateThreshold");
 		if(value != null)
 			setFailureRateThreshold(Float.parseFloat(value));
@@ -68,6 +74,7 @@ public class CircuitBreakerConfig {
 		
 	public CircuitBreakerConfig clone() {
 		CircuitBreakerConfig clone = new CircuitBreakerConfig();
+		clone.setName(name);
 		clone.slidingWindowSize = slidingWindowSize;
 		clone.permittedNumberOfCallsInHalfOpenState = permittedNumberOfCallsInHalfOpenState;
 		clone.slowCallDurationThreshold = slowCallDurationThreshold;
@@ -80,15 +87,16 @@ public class CircuitBreakerConfig {
 	}
 	
 	public void logInfoConfigProperties() {
-		logger.info("CircuitBreakerConfig:");
-		logger.info("\tfailureRateThreshold: " + failureRateThreshold);
-		logger.info("\tslowCallRateThreshold: " + slowCallRateThreshold);
-		logger.info("\tslowCallDurationThreshold: " + slowCallDurationThreshold);
-		logger.info("\tpermittedNumberOfCallsInHalfOpenState: " + permittedNumberOfCallsInHalfOpenState);
-		logger.info("\tslidingWindowSize: " + slidingWindowSize);
-		logger.info("\tminimumNumberOfCalls: " + minimumNumberOfCalls);
-		logger.info("\twaitDurationOpenedState: " + waitDurationOpenedState);
-		logger.info("\tmaxDurationOpenInHalfOpenState: " + maxDurationOpenInHalfOpenState);
+		logger.info(nameLogPrefix + "CircuitBreakerConfig:");
+		logger.info("\t" + nameLogPrefix + "name: " + name);
+		logger.info("\t" + nameLogPrefix + "failureRateThreshold: " + failureRateThreshold);
+		logger.info("\t" + nameLogPrefix + "slowCallRateThreshold: " + slowCallRateThreshold);
+		logger.info("\t" + nameLogPrefix + "slowCallDurationThreshold: " + slowCallDurationThreshold);
+		logger.info("\t" + nameLogPrefix + "permittedNumberOfCallsInHalfOpenState: " + permittedNumberOfCallsInHalfOpenState);
+		logger.info("\t" + nameLogPrefix + "slidingWindowSize: " + slidingWindowSize);
+		logger.info("\t" + nameLogPrefix + "minimumNumberOfCalls: " + minimumNumberOfCalls);
+		logger.info("\t" + nameLogPrefix + "waitDurationOpenedState: " + waitDurationOpenedState);
+		logger.info("\t" + nameLogPrefix + "maxDurationOpenInHalfOpenState: " + maxDurationOpenInHalfOpenState);
 	}
 	
 	public int getSlidingWindowSize() {
@@ -169,6 +177,22 @@ public class CircuitBreakerConfig {
 		if(maxDurationOpenInHalfOpenState < 0)
 			throw new IllegalArgumentException("maxDurationOpenInHalfOpenState must be positive or null");
 		this.maxDurationOpenInHalfOpenState = maxDurationOpenInHalfOpenState;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+		if(name == null)
+			nameLogPrefix = "";
+		else
+			nameLogPrefix = "[" + name + "] ";
+	}
+
+	String getNameLogPrefix() {
+		return nameLogPrefix;
 	}
 
 }
