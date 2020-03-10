@@ -21,13 +21,11 @@ public class DisabledStateTest {
 				public void run() {
 					for(int i = 0; i<LOOP_COUNT; i++) {
 						assertTrue(circuitBreaker.getBreakerState() instanceof BreakerDisabledState);
-						if(circuitBreaker.isClosedForThisCall()) {
-							assertTrue(circuitBreaker.getBreakerState() instanceof BreakerDisabledState);
-							TestUtils.sleep(SLEEP_TIME);
-							circuitBreaker.callSucceeded(SLEEP_TIME);
-						}
-						else
-							fail("circuitBreaker should always be closed");
+						assertTrue(circuitBreaker.isClosedForThisCall());
+						assertTrue(circuitBreaker.getBreakerState() instanceof BreakerDisabledState);
+						TestUtils.sleep(SLEEP_TIME);
+						circuitBreaker.callSucceeded(SLEEP_TIME);
+						assertTrue(circuitBreaker.getBreakerState() instanceof BreakerDisabledState);
 					}					
 				}
 			};

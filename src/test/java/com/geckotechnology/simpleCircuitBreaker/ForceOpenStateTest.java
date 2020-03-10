@@ -21,12 +21,9 @@ public class ForceOpenStateTest {
 				public void run() {
 					for(int i = 0; i<LOOP_COUNT; i++) {
 						assertTrue(circuitBreaker.getBreakerState() instanceof BreakerForcedOpenState);
-						if(circuitBreaker.isClosedForThisCall())
-							fail("circuitBreaker should always be closed");
-						else {
-							assertTrue(circuitBreaker.getBreakerState() instanceof BreakerForcedOpenState);
-							TestUtils.sleep(SLEEP_TIME);
-						}
+						assertFalse(circuitBreaker.isClosedForThisCall());
+						assertTrue(circuitBreaker.getBreakerState() instanceof BreakerForcedOpenState);
+						TestUtils.sleep(SLEEP_TIME);
 					}					
 				}
 			};
