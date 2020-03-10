@@ -14,9 +14,11 @@ It supports the 5 states:
 
 The following Resilience4j configuration properties are supported.
 maxDurationOpenInHalfOpenState is a new property described in the sample code paragraph.
+name is a new property that is used for logging purpose. If specified, each line is prefixed by [name].
 
 | Config property | Default Value | Special Values |
 | ------------- | ------------- | --------|
+| name | | |
 | failureRateThreshold  | 50  | If set to 0, breaker will ignore failures |
 | slowCallRateThreshold  | 100 | If set to 0, breaker will ignore slow calls |
 | slowCallDurationThreshold  | 60000 [ms] | If set to 0, breaker will ignore slow calls |
