@@ -68,6 +68,11 @@ SVC1.failureRateThreshold=20
 SVC1.slidingWindowSize=150
 ```
 
+## Overhead
+Load test, included in the JUnit tests, shows an overhead less than 0.05ms per wrapped logic.
+
+The load test is based on 4 concurrent threads running with a CLOSED circuit breaker, with a wrapped logic around 6.5ms.
+
 ## Concurrency
 The code has 3 synchronized methods, it has minimum impact to initial code performance. Actual business logic is not included in the synchronized code, so blocking time is minimum
   - `boolean isClosedForThisCall()` to check the state of the breaker for this current call
