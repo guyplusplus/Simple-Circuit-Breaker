@@ -12,6 +12,7 @@ public class DisabledStateTest {
 
 	@Test
 	public void test() {
+		System.out.println("Starting DisabledStateTest. Shall take " + (LOOP_COUNT * SLEEP_TIME) + " ms");
 		CircuitBreakerConfig config = new CircuitBreakerConfig();
 		config.setSlidingWindowSize(0);
 		final CircuitBreaker circuitBreaker = new CircuitBreaker(config);

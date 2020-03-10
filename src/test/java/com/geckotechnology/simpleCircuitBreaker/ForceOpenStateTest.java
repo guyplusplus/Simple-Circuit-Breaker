@@ -12,6 +12,7 @@ public class ForceOpenStateTest {
 
 	@Test
 	public void test() {
+		System.out.println("Starting ForceOpenStateTest. Shall take " + (LOOP_COUNT * SLEEP_TIME) + " ms");
 		CircuitBreakerConfig config = new CircuitBreakerConfig();
 		config.setSlidingWindowSize(-1);
 		final CircuitBreaker circuitBreaker = new CircuitBreaker(config);
