@@ -11,7 +11,7 @@ public class OverheadTest {
 	private static final int ARRAY_SIZE = 5017;
 	private static final int LOOP_ONE_CALL = 500000;
 	private static final int LOOP_TEST = 5000;
-	private static final int LOOP_TEST_WARMUP = 10000;
+	private static final int LOOP_TEST_WARMUP = 5000;
 	private static final int THREAD_COUNT = 4;
 		
 	@Before
@@ -37,7 +37,7 @@ public class OverheadTest {
 		System.out.println("duration (ms) per oneCall - NO BREAKER: " + durationPerCallNoBreaker);
 		System.out.println("duration (ms) per oneCall - WITH BREAKER: " + durationPerCallWithBreaker);
 		System.out.println("Overhead (ms) per oneCall of breaker: " + overHead);
-		assertTrue(overHead < 0.1);
+		assertTrue(overHead < 0.2);
 	}
 	
 	@Test
@@ -89,7 +89,7 @@ public class OverheadTest {
 		System.out.println("duration (ms) per oneCall - NO BREAKER: " + durationPerCallNoBreaker);
 		System.out.println("duration (ms) per oneCall - WITH BREAKER: " + durationPerCallWithBreaker);
 		System.out.println("Overhead (ms) per oneCall of breaker: " + overHead);
-		assertTrue(overHead < 0.1);
+		assertTrue(overHead < 0.2);
 	}
 	
 	private double singleThreadNoBreaker() {
