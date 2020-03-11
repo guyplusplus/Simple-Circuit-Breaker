@@ -100,9 +100,4 @@ public class CLosedStateSlidingWindowTest {
 		assertTrue(circuitBreaker.getBreakerState() instanceof BreakerClosedState);
 		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(1, 1, 1));
 	}
-	
-	public static void main(String[] args) {
-		new CLosedStateSlidingWindowTest().test();
-	}
-
 }
