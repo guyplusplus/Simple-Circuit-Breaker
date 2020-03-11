@@ -35,7 +35,6 @@ class BreakerClosedState implements BreakerStateInterface {
 
 	@Override
 	public void callFailed(long callDuration) {
-		failureCallCount++;
 		callFailedOrSuccedded(callDuration, true);
 	}
 
@@ -45,12 +44,7 @@ class BreakerClosedState implements BreakerStateInterface {
 	}
 
     private void callFailedOrSuccedded(long callDuration, boolean isFailureCall) {
-    	callCount++;
-    	boolean isSlowCall = false;
-    	if(circuitBreaker.isSlowCall(callDuration)) {
-    		slowCallDurationCount++;
-    		isSlowCall = true;
-    	}
+    	boolean isSlowCall = circuitBreaker.isSlowCall(callDuration);
     	int nowInSec = (int)(System.currentTimeMillis() / 1000);
     	if(lastCallTimestampInSec == nowInSec) {
     		//just add to current bucket, we are still in the same second
@@ -80,6 +74,11 @@ class BreakerClosedState implements BreakerStateInterface {
     }
     
     private void addToLastCallTimestampInSecBucket(boolean isFailureCall, boolean isSlowCall) {
+    	callCount++;
+    	if(isFailureCall)
+    		failureCallCount++;
+    	if(isSlowCall)
+    		slowCallDurationCount++;
     	int lastCallTimestampBucket = lastCallTimestampInSec % slidingWindowSize;
     	callCountBuckets[lastCallTimestampBucket]++;
     	if(isFailureCall)
@@ -98,11 +97,13 @@ class BreakerClosedState implements BreakerStateInterface {
 		slowCallDurationCountBuckets[bucket] = 0;
     }
     
+    
     /**
-     * Method used during unit test to validate array and sum are correctly aligned. If not, code exists
+     * Method used during unit test to validate array and sum are correctly aligned.
+     * Return true if all ok, false otherwise
      * Method is not synchronized
      */
-    void testCheckSumForUnitTest() {
+    boolean testCheckSumForUnitTest() {
         int checkCallCount = 0;
         int checkFailureCallCount = 0;
         int checkSlowCallDurationCount = 0;
@@ -114,9 +115,28 @@ class BreakerClosedState implements BreakerStateInterface {
     	if(checkCallCount != callCount ||
     			checkFailureCallCount != failureCallCount ||
     			checkSlowCallDurationCount != slowCallDurationCount) {
-    		System.out.println("incremental callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
-    		System.out.println("calculated  callCount: " + checkCallCount + ", failureCallCount: " + checkFailureCallCount + ", slowCallDurationCount: " + checkSlowCallDurationCount);
-    		System.exit(1);
+    		System.out.println("actual     callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
+    		System.out.println("calculated callCount: " + checkCallCount + ", failureCallCount: " + checkFailureCallCount + ", slowCallDurationCount: " + checkSlowCallDurationCount);
+    		return false;
     	}
+    	return true;
+    }
+   /**
+     * Method used during unit test to validate array and sum are correctly aligned.
+     * Return true if all ok, false otherwise
+     * Method is not synchronized
+     */
+    boolean testCheckSumForUnitTest(int expectedCallCount, int expectedFailureCallCount, int expectedSlowCallDurationCount) {
+    	boolean test1 = testCheckSumForUnitTest();
+    	if(!test1)
+    		return false;
+    	if(callCount != expectedCallCount ||
+    			failureCallCount != expectedFailureCallCount ||
+    			slowCallDurationCount != expectedSlowCallDurationCount) {
+    		System.out.println("actual   callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
+    		System.out.println("expected callCount: " + expectedCallCount + ", failureCallCount: " + expectedFailureCallCount + ", slowCallDurationCount: " + expectedSlowCallDurationCount);
+    		return false;
+    	}
+    	return true;
     }
 }
