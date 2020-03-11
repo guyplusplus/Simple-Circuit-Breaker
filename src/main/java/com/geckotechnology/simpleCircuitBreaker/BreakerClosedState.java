@@ -127,8 +127,7 @@ class BreakerClosedState implements BreakerStateInterface {
      * Method is not synchronized
      */
     boolean testCheckSumForUnitTest(int expectedCallCount, int expectedFailureCallCount, int expectedSlowCallDurationCount) {
-    	boolean test1 = testCheckSumForUnitTest();
-    	if(!test1)
+    	if(!testCheckSumForUnitTest())
     		return false;
     	if(callCount != expectedCallCount ||
     			failureCallCount != expectedFailureCallCount ||
