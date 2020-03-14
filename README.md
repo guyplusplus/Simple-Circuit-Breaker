@@ -35,6 +35,7 @@ Pseudo-code should look like this:
 ```
 CircuitBreakerConfig config = new CircuitBreakerConfig();
 config.set...;
+logger.info(config);
 CircuitBreaker circuitBreaker = new CircuitBreaker(config);
 loop
   if(circuitBreaker.isClosedForThisCall())
@@ -74,10 +75,26 @@ Load test, included in the JUnit tests, shows an overhead less than 0.05ms per w
 The load test is based on 4 concurrent threads running with a CLOSED circuit breaker, with a wrapped logic around 6.5ms.
 
 ## Concurrency
-The code has 3 synchronized methods, it has minimum impact to initial code performance. Actual business logic is not included in the synchronized code, so blocking time is minimum
+The code has 3 methods with a synchronized portion, it has minimum impact to initial code performance. Actual business logic (`doSomething` in the pseudo-code above) is not included in the synchronized code, so blocking time is minimum
   - `boolean isClosedForThisCall()` to check the state of the breaker for this current call
   - `void callFailed(long callDuration)` to inform the breaker that the call failed
   - `void callSucceeded(long callDuration)` to inform the breaker that the call succeeded
+
+Registered EventListeners are informed by the thread performing the business logic, but outside any synchronized code. 
+
+## Event Listeners
+The library supports simple event listener. Registration and consumption is straight forward.
+
+```
+circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new BreakerStateEventListener() {
+	@Override
+	public void onCircuitBreakerStateChangeEvent(CircuitBreakerStateChangeEvent event) {
+		logger.warning("CircuitBreaker state changed. " + event);
+		...
+	}
+});
+
+```
 
 ## Log File Output
 Log file contains information about the breaker state change as well as the reason and simple statistics. Here is simple content. Log monitoring can be used to capture events.
