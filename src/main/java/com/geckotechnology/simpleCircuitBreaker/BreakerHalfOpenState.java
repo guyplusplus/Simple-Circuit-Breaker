@@ -64,9 +64,10 @@ class BreakerHalfOpenState implements BreakerStateInterface {
     	//  If yes, go to open state
     	//  If no, go to closed state
     	if(circuitBreaker.isExceedFailureOrSlowRateThreshold(countStats))
-    		circuitBreaker.moveToOpenState("Threshold exceeded. countStats:{" + countStats.toExpressiveStatsString() + "}");
-    	else {
-    		circuitBreaker.moveToClosedState("Reached permittedNumberOfCallsInHalfOpenState and no threshold exceeded. countStats:{" + countStats.toExpressiveStatsString() + "}");
-    	}
+    		circuitBreaker.moveToOpenState("Reached permittedNumberOfCallsInHalfOpenState and threshold exceeded. countStats:{" +
+    				countStats.toCountAndRatioStatsString() + "}");
+    	else
+    		circuitBreaker.moveToClosedState("Reached permittedNumberOfCallsInHalfOpenState and no threshold exceeded. countStats:{" +
+    				countStats.toCountAndRatioStatsString() + "}");
     }
 }

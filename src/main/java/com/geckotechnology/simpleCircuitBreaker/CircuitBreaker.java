@@ -59,27 +59,34 @@ public class CircuitBreaker {
     
     void moveToClosedState(String details) {
     	breakerState = new BreakerClosedState(this);
-    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), details));
+    	registerEvent(details);
     }
 
     void moveToOpenState(String details) {
     	breakerState = new BreakerOpenState(this);
-    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), details));
+    	registerEvent(details);
     }
 
     void moveToHalfOpenState(String details) {
     	breakerState = new BreakerHalfOpenState(this);
-    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), details));
+    	registerEvent(details);
     }
 
     void moveToDisabledState(String details) {
     	breakerState = new BreakerDisabledState(this);
-    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), details));
+    	registerEvent(details);
     }
 
     void moveToForcedOpenState(String details) {
     	breakerState = new BreakerForcedOpenState(this);
-    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), details));
+    	registerEvent(details);
+    }
+    
+    private void registerEvent(String details) {
+    	breakerStateEventManager.registerEvent(
+    			new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(),
+    			breakerState.getBreakerStateType(),
+    			details));    	
     }
     
     boolean isSlowCall(long callDuration) {

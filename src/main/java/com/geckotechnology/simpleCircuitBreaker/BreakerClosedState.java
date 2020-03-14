@@ -70,7 +70,7 @@ class BreakerClosedState implements BreakerStateInterface {
     	//check now if we need to move to open state
     	if(countStats.callCount >= circuitBreaker.getCircuitBreakerConfig().getMinimumNumberOfCalls()) {
     		if(circuitBreaker.isExceedFailureOrSlowRateThreshold(countStats)) {
-    			circuitBreaker.moveToOpenState("Threshold exceeded. countStats:{" + countStats.toExpressiveStatsString() + "}");
+    			circuitBreaker.moveToOpenState("Threshold exceeded. countStats:{" + countStats.toCountAndRatioStatsString() + "}");
     		}
     	}
     }
@@ -99,6 +99,10 @@ class BreakerClosedState implements BreakerStateInterface {
 		slowCallDurationCountBuckets[bucket] = 0;
     }
     
+    CountStats getCountStats() {
+    	return countStats;
+    }
+    
     CountStats calculateAggregatedCountStatsForUnitTest() {
     	CountStats aggregatedCountStats = new CountStats();
     	for(int i = 0; i<slidingWindowSize; i++) {
@@ -107,9 +111,5 @@ class BreakerClosedState implements BreakerStateInterface {
     		aggregatedCountStats.slowCallDurationCount += slowCallDurationCountBuckets[i];
     	}   	
     	return aggregatedCountStats;
-    }
-    
-    CountStats getCountStats() {
-    	return countStats;
     }
 }

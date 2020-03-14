@@ -23,10 +23,14 @@ public class TestUtils {
 	
 	public static boolean validateAggregatedCountStatsMatches(BreakerClosedState breakerClosedState,
 			int expectedCallCount, int expectedFailureCallCount, int expectedSlowCallDurationCount) {
+		//step 1: ensure that sum(all buckets) = current countStats
 		CountStats agrregatedCountStats = breakerClosedState.calculateAggregatedCountStatsForUnitTest();
 		boolean checkAggregated = isCountStatsEqual(agrregatedCountStats, breakerClosedState.getCountStats());
-		if(!checkAggregated)
+		if(!checkAggregated) {
+			System.out.println("sum(all buckets) is different from current countStats");
 			return false;
+		}
+		//step 2: all passed values match current countStats
 		CountStats expectedCountStats = new CountStats();
 		expectedCountStats.callCount = expectedCallCount;
 		expectedCountStats.failureCallCount = expectedFailureCallCount;

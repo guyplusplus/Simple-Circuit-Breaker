@@ -17,6 +17,10 @@ public class CountStats {
     	slowCallRate = (float)slowCallDurationCount * 100f / (float)callCount; 
     }
     
+    /**
+     * Return only count statistics
+     * @return string such as: callCount:30, failureCallCount:12, slowCallDurationCount:14
+     */
     public String toCountStatsString() {
  		StringBuilder sb = new StringBuilder();
  		sb.append("callCount:").append(callCount);
@@ -24,8 +28,12 @@ public class CountStats {
  		sb.append(", ").append("slowCallDurationCount:").append(slowCallDurationCount);
  		return sb.toString();
      }
-
-    public String toExpressiveStatsString() {
+    
+    /**
+     * Return count and ratio statistics
+     * @return string such as: callCount:30, failureCallCount:12, slowCallDurationCount:14, failureRate:40.0, slowCallRate:46.666668
+     */
+    public String toCountAndRatioStatsString() {
     	if(failureRate == -1 || slowCallRate == -1)
     		calculateRates();
  		StringBuilder sb = new StringBuilder(toCountStatsString());
