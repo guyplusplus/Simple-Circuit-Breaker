@@ -17,6 +17,11 @@ class BreakerHalfOpenState implements BreakerStateInterface {
 	}
 	
 	@Override
+	public BreakerStateType getBreakerStateType() {
+		return BreakerStateType.HALF_OPEN;
+	}
+	
+	@Override
 	public boolean isClosedForThisCall() {
 		//ensure permittedNumberOfCallsInHalfOpenState calls are executed, by returning true
 		if(permittedNumberOfCallsInHalfOpenStateSoFar < circuitBreaker.getCircuitBreakerConfig().getPermittedNumberOfCallsInHalfOpenState()) {
@@ -34,7 +39,7 @@ class BreakerHalfOpenState implements BreakerStateInterface {
 		}
 		if(System.currentTimeMillis() >= lastOpenCallTimeLimit) {
 			//we are beyond maxDurationOpenInHalfOpenState. Need to go back to CLOSED state
-    		logger.severe(circuitBreaker.getCircuitBreakerConfig().getNameLogPrefix() + "maxDurationOpenInHalfOpenState is reached. CallCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
+    		logger.severe("maxDurationOpenInHalfOpenState is reached. CallCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
     		circuitBreaker.moveToClosedState();
     		return circuitBreaker.isClosedForThisCall();
 		}
@@ -66,7 +71,7 @@ class BreakerHalfOpenState implements BreakerStateInterface {
     	if(circuitBreaker.isExceedFailureOrSlowRateThreshold(callCount, failureCallCount, slowCallDurationCount))
     		circuitBreaker.moveToOpenState();
     	else {
-    		logger.info(circuitBreaker.getCircuitBreakerConfig().getNameLogPrefix() + "callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
+    		logger.info("callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
     		circuitBreaker.moveToClosedState();
     	}
     }

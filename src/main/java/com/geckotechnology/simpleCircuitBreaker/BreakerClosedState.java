@@ -18,6 +18,11 @@ class BreakerClosedState implements BreakerStateInterface {
 		clearAllBuckets();
 	}
 	
+	@Override
+	public BreakerStateType getBreakerStateType() {
+		return BreakerStateType.CLOSED;
+	}
+	
 	private void clearAllBuckets() {
 		callCountBuckets = new int[slidingWindowSize];
 		failureCallCountBuckets = new int[slidingWindowSize];

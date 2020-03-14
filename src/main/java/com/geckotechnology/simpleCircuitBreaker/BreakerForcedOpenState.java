@@ -6,6 +6,11 @@ class BreakerForcedOpenState implements BreakerStateInterface {
 	}
 	
 	@Override
+	public BreakerStateType getBreakerStateType() {
+		return BreakerStateType.FORCED_OPEN;
+	}
+	
+	@Override
 	public boolean isClosedForThisCall() {
 		//always opened
 		return false;

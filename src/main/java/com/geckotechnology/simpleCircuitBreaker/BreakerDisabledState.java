@@ -6,6 +6,11 @@ class BreakerDisabledState implements BreakerStateInterface {
 	}
 	
 	@Override
+	public BreakerStateType getBreakerStateType() {
+		return BreakerStateType.DISABLED;
+	}
+	
+	@Override
 	public boolean isClosedForThisCall() {
 		//always closed
 		return true;

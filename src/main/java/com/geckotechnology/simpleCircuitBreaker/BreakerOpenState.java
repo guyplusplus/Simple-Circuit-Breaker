@@ -7,7 +7,12 @@ class BreakerOpenState implements BreakerStateInterface {
 	
 	BreakerOpenState(CircuitBreaker circuitBreaker) {
 		this.circuitBreaker = circuitBreaker;
-		openStateEndTimestamp = System.currentTimeMillis() + circuitBreaker.getCircuitBreakerConfig().getWaitDurationOpenedState();
+		openStateEndTimestamp = System.currentTimeMillis() + circuitBreaker.getCircuitBreakerConfig().getWaitDurationInOpenState();
+	}
+	
+	@Override
+	public BreakerStateType getBreakerStateType() {
+		return BreakerStateType.OPEN;
 	}
 	
 	@Override
