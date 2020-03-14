@@ -22,7 +22,7 @@ public class BreakerStateEventManager {
 	/**
 	 * 
 	 * @param listener
-	 * @return true if the listener was already register, false othewise
+	 * @return true if the listener was already register, false otherwise
 	 */
 	public boolean removeBreakerStateEventListener(BreakerStateEventListener listener) {
 		if(listener == null)

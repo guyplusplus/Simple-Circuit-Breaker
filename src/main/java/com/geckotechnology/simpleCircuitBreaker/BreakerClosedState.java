@@ -70,7 +70,7 @@ class BreakerClosedState implements BreakerStateInterface {
     	//check now if we need to move to open state
     	if(countStats.callCount >= circuitBreaker.getCircuitBreakerConfig().getMinimumNumberOfCalls()) {
     		if(circuitBreaker.isExceedFailureOrSlowRateThreshold(countStats)) {
-    			circuitBreaker.moveToOpenState("Threshold exceeded. " + countStats.toExpressiveStatsString());
+    			circuitBreaker.moveToOpenState("Threshold exceeded. countStats:{" + countStats.toExpressiveStatsString() + "}");
     		}
     	}
     }

@@ -97,16 +97,12 @@ public class CircuitBreaker {
      */
     boolean isExceedFailureOrSlowRateThreshold(CountStats countStats) {
 		countStats.calculateRates();
-		if(circuitBreakerConfig.getFailureRateThreshold() > 0) {
-	        if(countStats.failureRate >= circuitBreakerConfig.getFailureRateThreshold()) {
-	    		return true;
-			}
-		}
-		if(circuitBreakerConfig.getSlowCallRateThreshold() > 0) {
-			if(countStats.slowCallRate >= circuitBreakerConfig.getSlowCallRateThreshold()) {
-	    		return true;
-			}
-        }
+		if(circuitBreakerConfig.getFailureRateThreshold() > 0 &&
+				countStats.failureRate >= circuitBreakerConfig.getFailureRateThreshold())
+	    	return true;
+		if(circuitBreakerConfig.getSlowCallRateThreshold() > 0 && 
+				countStats.slowCallRate >= circuitBreakerConfig.getSlowCallRateThreshold())
+			return true;
         return false;
     }
 }
