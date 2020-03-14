@@ -15,19 +15,19 @@ public class ClosedStateSlidingWindowTest {
 		config.setSlowCallRateThreshold(0);
 		CircuitBreaker circuitBreaker = new CircuitBreaker(config);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(0, 0, 0));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 0, 0, 0));
 		
 		//bucket 0
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callSucceeded(10);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(1, 0, 0));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 1, 0, 0));
 
 		//bucket 0
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callSucceeded(120);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(2, 0, 1));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 2, 0, 1));
 
 		TestUtils.sleep(2000);
 		
@@ -35,7 +35,7 @@ public class ClosedStateSlidingWindowTest {
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callFailed(120);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(3, 1, 2));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 3, 1, 2));
 		
 		TestUtils.sleep(1000);
 
@@ -43,7 +43,7 @@ public class ClosedStateSlidingWindowTest {
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callFailed(120);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(4, 2, 3));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 4, 2, 3));
 		
 		TestUtils.sleep(1000);
 
@@ -51,7 +51,7 @@ public class ClosedStateSlidingWindowTest {
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callFailed(2);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(5, 3, 3));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 5, 3, 3));
 		
 		TestUtils.sleep(1000);
 
@@ -66,7 +66,7 @@ public class ClosedStateSlidingWindowTest {
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callFailed(2);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(5, 4, 3));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 5, 4, 3));
 
 		TestUtils.sleep(5000);
 
@@ -74,7 +74,7 @@ public class ClosedStateSlidingWindowTest {
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callFailed(250);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(1, 1, 1));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 1, 1, 1));
 
 		TestUtils.sleep(5000);
 
@@ -82,7 +82,7 @@ public class ClosedStateSlidingWindowTest {
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callFailed(250);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(1, 1, 1));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 1, 1, 1));
 
 		TestUtils.sleep(4000);
 
@@ -90,7 +90,7 @@ public class ClosedStateSlidingWindowTest {
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callFailed(250);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(2, 2, 2));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 2, 2, 2));
 
 		TestUtils.sleep(6000);
 
@@ -98,6 +98,6 @@ public class ClosedStateSlidingWindowTest {
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callFailed(250);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertTrue(((BreakerClosedState)circuitBreaker.getBreakerState()).testCheckSumForUnitTest(1, 1, 1));
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches((BreakerClosedState)circuitBreaker.getBreakerState(), 1, 1, 1));
 	}
 }

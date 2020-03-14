@@ -99,45 +99,17 @@ class BreakerClosedState implements BreakerStateInterface {
 		slowCallDurationCountBuckets[bucket] = 0;
     }
     
-    
-    /**
-     * Method used during unit test to validate array and sum are correctly aligned.
-     * Return true if all ok, false otherwise
-     * Method is not synchronized
-     */
-    boolean testCheckSumForUnitTest() {
-        int checkCallCount = 0;
-        int checkFailureCallCount = 0;
-        int checkSlowCallDurationCount = 0;
+    CountStats calculateAggregatedCountStatsForUnitTest() {
+    	CountStats aggregatedCountStats = new CountStats();
     	for(int i = 0; i<slidingWindowSize; i++) {
-    		checkCallCount += callCountBuckets[i];
-    		checkFailureCallCount += failureCallCountBuckets[i];
-    		checkSlowCallDurationCount += slowCallDurationCountBuckets[i];
-    	}
-    	if(checkCallCount != countStats.callCount ||
-    			checkFailureCallCount != countStats.failureCallCount ||
-    			checkSlowCallDurationCount != countStats.slowCallDurationCount) {
-    		System.out.println("actual     callCount: " + countStats.callCount + ", failureCallCount: " + countStats.failureCallCount + ", slowCallDurationCount: " + countStats.slowCallDurationCount);
-    		System.out.println("calculated callCount: " + checkCallCount + ", failureCallCount: " + checkFailureCallCount + ", slowCallDurationCount: " + checkSlowCallDurationCount);
-    		return false;
-    	}
-    	return true;
+    		aggregatedCountStats.callCount += callCountBuckets[i];
+    		aggregatedCountStats.failureCallCount += failureCallCountBuckets[i];
+    		aggregatedCountStats.slowCallDurationCount += slowCallDurationCountBuckets[i];
+    	}   	
+    	return aggregatedCountStats;
     }
-   /**
-     * Method used during unit test to validate array and sum are correctly aligned.
-     * Return true if all ok, false otherwise
-     * Method is not synchronized
-     */
-    boolean testCheckSumForUnitTest(int expectedCallCount, int expectedFailureCallCount, int expectedSlowCallDurationCount) {
-    	if(!testCheckSumForUnitTest())
-    		return false;
-    	if(countStats.callCount != expectedCallCount ||
-    			countStats.failureCallCount != expectedFailureCallCount ||
-    					countStats.slowCallDurationCount != expectedSlowCallDurationCount) {
-    		System.out.println("actual   callCount: " + countStats.callCount + ", failureCallCount: " + countStats.failureCallCount + ", slowCallDurationCount: " + countStats.slowCallDurationCount);
-    		System.out.println("expected callCount: " + expectedCallCount + ", failureCallCount: " + expectedFailureCallCount + ", slowCallDurationCount: " + expectedSlowCallDurationCount);
-    		return false;
-    	}
-    	return true;
+    
+    CountStats getCountStats() {
+    	return countStats;
     }
 }
