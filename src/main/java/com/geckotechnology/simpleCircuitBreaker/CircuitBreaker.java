@@ -10,7 +10,6 @@ public class CircuitBreaker {
 
     public CircuitBreaker(CircuitBreakerConfig aCircuitBreakerDefinition) {
     	circuitBreakerConfig = aCircuitBreakerDefinition.clone();
-    	circuitBreakerConfig.logInfoConfigProperties();
     	if(circuitBreakerConfig.getSlidingWindowSize() > 0)
     		moveToClosedState();
     	else if(circuitBreakerConfig.getSlidingWindowSize() == 0)
@@ -45,27 +44,27 @@ public class CircuitBreaker {
     
     void moveToClosedState() {
     	breakerState = new BreakerClosedState(this);
-    	logger.info(circuitBreakerConfig.getNameLogPrefix() + "Breaker state changed to: CLOSED");
+    	logger.info("Breaker state changed to: CLOSED");
     }
 
     void moveToOpenState() {
     	breakerState = new BreakerOpenState(this);
-    	logger.info(circuitBreakerConfig.getNameLogPrefix() + "Breaker state changed to: OPEN");
+    	logger.info("Breaker state changed to: OPEN");
     }
 
     void moveToHalfOpenState() {
     	breakerState = new BreakerHalfOpenState(this);
-    	logger.info(circuitBreakerConfig.getNameLogPrefix() + "Breaker state changed to: HALF_OPEN");
+    	logger.info("Breaker state changed to: HALF_OPEN");
     }
 
     void moveToDisabledState() {
     	breakerState = new BreakerDisabledState(this);
-    	logger.info(circuitBreakerConfig.getNameLogPrefix() + "Breaker state changed to: DISABLED");
+    	logger.info("Breaker state changed to: DISABLED");
     }
 
     void moveToForcedOpenState() {
     	breakerState = new BreakerForcedOpenState(this);
-    	logger.info(circuitBreakerConfig.getNameLogPrefix() + "Breaker state changed to: FORCED_OPEN");
+    	logger.info("Breaker state changed to: FORCED_OPEN");
     }
     
     boolean isSlowCall(long callDuration) {
@@ -81,14 +80,14 @@ public class CircuitBreaker {
 		if(circuitBreakerConfig.getFailureRateThreshold() > 0) {
 			float failureRate = (float)failureCallCount * 100f / (float)callCount; 
 	        if(failureRate >= circuitBreakerConfig.getFailureRateThreshold()) {
-				logger.warning(circuitBreakerConfig.getNameLogPrefix() + "High failureRate: " + failureRate + "%, failureCallCount: " + failureCallCount + ", callCount: " + callCount);
+				logger.warning("High failureRate: " + failureRate + "%, failureCallCount: " + failureCallCount + ", callCount: " + callCount);
 	    		return true;
 			}
 		}
 		if(circuitBreakerConfig.getSlowCallRateThreshold() > 0) {
 			float slowCallRate = (float)slowCallDurationCount * 100f / (float)callCount; 
 			if(slowCallRate >= circuitBreakerConfig.getSlowCallRateThreshold()) {
-	    		logger.warning(circuitBreakerConfig.getNameLogPrefix() + "High slowCallRate: " + slowCallRate + "%, slowCallDurationCount: " + slowCallDurationCount + ", callCount: " + callCount);
+	    		logger.warning("High slowCallRate: " + slowCallRate + "%, slowCallDurationCount: " + slowCallDurationCount + ", callCount: " + callCount);
 	    		return true;
 			}
         }

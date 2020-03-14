@@ -1,23 +1,28 @@
 package com.geckotechnology.simpleCircuitBreaker;
 
 import java.util.Properties;
-import java.util.logging.Logger;
 
 public class CircuitBreakerConfig {
 	
-    private static final Logger logger = Logger.getLogger(CircuitBreakerConfig.class.getName());
-    
-    private String name = null;
-    private float failureRateThreshold = 50;
-	private float slowCallRateThreshold = 100;
-	private long slowCallDurationThreshold = 60000;
-	private int permittedNumberOfCallsInHalfOpenState = 10;
-	private int slidingWindowSize = 100;
-	private int minimumNumberOfCalls = 10;
-	private long waitDurationOpenedState = 60000;
-	private long maxDurationOpenInHalfOpenState = 120000;
-
-    private String nameLogPrefix = "";
+	private static final String name_DEFAULT = "";
+	private static final float FAILURE_RATE_THRESHOLD_DEFAULT = 50;
+	private static final float SLOW_CALL_RATE_THRESHOLD_DEFAULT = 100;
+	private static final long SLOW_CALL_DURATION_THRESHOLD_DEFAULT = 60000;
+	private static final int PERMITTED_NUMBER_OF_CALLS_IN_HALF_OPEN_STATE_DEFAULT = 10;
+	private static final int SLIDING_WINDOW_SIZE_DEFAULT = 100;
+	private static final int MINIMUM_NUMBER_OF_CALLS_DEFAULT = 10;
+	private static final long WAIT_DURATION_IN_OPEN_STATE_DEFAULT = 60000;
+	private static final long MAX_DURATION_OPE_IN_HALF_OPEN_STATE_DEFAULT = 120000;
+	
+    private String name = name_DEFAULT;
+    private float failureRateThreshold = FAILURE_RATE_THRESHOLD_DEFAULT;
+	private float slowCallRateThreshold = SLOW_CALL_RATE_THRESHOLD_DEFAULT;
+	private long slowCallDurationThreshold = SLOW_CALL_DURATION_THRESHOLD_DEFAULT;
+	private int permittedNumberOfCallsInHalfOpenState = PERMITTED_NUMBER_OF_CALLS_IN_HALF_OPEN_STATE_DEFAULT;
+	private int slidingWindowSize = SLIDING_WINDOW_SIZE_DEFAULT;
+	private int minimumNumberOfCalls = MINIMUM_NUMBER_OF_CALLS_DEFAULT;
+	private long waitDurationInOpenState = 	WAIT_DURATION_IN_OPEN_STATE_DEFAULT;
+	private long maxDurationOpenInHalfOpenState = MAX_DURATION_OPE_IN_HALF_OPEN_STATE_DEFAULT;
 
 	/**
 	 * Default constructor with default values
@@ -64,9 +69,9 @@ public class CircuitBreakerConfig {
 		value = props.getProperty(prefix + "minimumNumberOfCalls");
 		if(value != null)
 			setMinimumNumberOfCalls(Integer.parseInt(value));
-		value = props.getProperty(prefix + "waitDurationOpenedState");
+		value = props.getProperty(prefix + "waitDurationInOpenState");
 		if(value != null)
-			setWaitDurationOpenedState(Long.parseLong(value));
+			setWaitDurationInOpenState(Long.parseLong(value));
 		value = props.getProperty(prefix + "maxDurationOpenInHalfOpenState");
 		if(value != null)
 			setMaxDurationOpenInHalfOpenState(Long.parseLong(value));
@@ -81,22 +86,24 @@ public class CircuitBreakerConfig {
 		clone.minimumNumberOfCalls = minimumNumberOfCalls;
 		clone.failureRateThreshold = failureRateThreshold;
 		clone.slowCallRateThreshold = slowCallRateThreshold;
-		clone.waitDurationOpenedState = waitDurationOpenedState;
+		clone.waitDurationInOpenState = waitDurationInOpenState;
 		clone.maxDurationOpenInHalfOpenState = maxDurationOpenInHalfOpenState;
 		return clone;
 	}
 	
-	public void logInfoConfigProperties() {
-		logger.info(nameLogPrefix + "CircuitBreakerConfig:");
-		logger.info("\t" + nameLogPrefix + "name: " + name);
-		logger.info("\t" + nameLogPrefix + "failureRateThreshold: " + failureRateThreshold);
-		logger.info("\t" + nameLogPrefix + "slowCallRateThreshold: " + slowCallRateThreshold);
-		logger.info("\t" + nameLogPrefix + "slowCallDurationThreshold: " + slowCallDurationThreshold);
-		logger.info("\t" + nameLogPrefix + "permittedNumberOfCallsInHalfOpenState: " + permittedNumberOfCallsInHalfOpenState);
-		logger.info("\t" + nameLogPrefix + "slidingWindowSize: " + slidingWindowSize);
-		logger.info("\t" + nameLogPrefix + "minimumNumberOfCalls: " + minimumNumberOfCalls);
-		logger.info("\t" + nameLogPrefix + "waitDurationOpenedState: " + waitDurationOpenedState);
-		logger.info("\t" + nameLogPrefix + "maxDurationOpenInHalfOpenState: " + maxDurationOpenInHalfOpenState);
+	public String toString() {
+		StringBuilder sb = new StringBuilder("CircuitBreakerConfig:{");
+		sb.append("name:").append(name);
+		sb.append(", ").append("failureRateThreshold:").append(failureRateThreshold);
+		sb.append(", ").append("slowCallRateThreshold:").append(slowCallRateThreshold);
+		sb.append(", ").append("slowCallDurationThreshold:").append(slowCallDurationThreshold);
+		sb.append(", ").append("permittedNumberOfCallsInHalfOpenState:").append(permittedNumberOfCallsInHalfOpenState);
+		sb.append(", ").append("slidingWindowSize:").append(slidingWindowSize);
+		sb.append(", ").append("minimumNumberOfCalls:").append(minimumNumberOfCalls);
+		sb.append(", ").append("waitDurationOpenedState:").append(waitDurationInOpenState);
+		sb.append(", ").append("maxDurationOpenInHalfOpenState:").append(maxDurationOpenInHalfOpenState);
+		sb.append("}");
+		return sb.toString();
 	}
 	
 	public int getSlidingWindowSize() {
@@ -149,14 +156,14 @@ public class CircuitBreakerConfig {
 		this.slowCallRateThreshold = slowCallRateThreshold;
 	}
 
-	public long getWaitDurationOpenedState() {
-		return waitDurationOpenedState;
+	public long getWaitDurationInOpenState() {
+		return waitDurationInOpenState;
 	}
 
-	public void setWaitDurationOpenedState(long waitDurationOpenedState) {
-		if(waitDurationOpenedState <= 0)
+	public void setWaitDurationInOpenState(long waitDurationInOpenState) {
+		if(waitDurationInOpenState <= 0)
 			throw new IllegalArgumentException("waitDurationOpenedState must be positive");
-		this.waitDurationOpenedState = waitDurationOpenedState;
+		this.waitDurationInOpenState = waitDurationInOpenState;
 	}
 
 	public int getPermittedNumberOfCallsInHalfOpenState() {
@@ -185,14 +192,6 @@ public class CircuitBreakerConfig {
 
 	public void setName(String name) {
 		this.name = name;
-		if(name == null)
-			nameLogPrefix = "";
-		else
-			nameLogPrefix = "[" + name + "] ";
-	}
-
-	String getNameLogPrefix() {
-		return nameLogPrefix;
 	}
 
 }
