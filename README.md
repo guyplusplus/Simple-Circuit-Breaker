@@ -18,7 +18,7 @@ name is a new property that is used for logging purpose. If specified, each line
 
 | Config property | Default Value | Special Values |
 | ------------- | ------------- | --------|
-| name | | |
+| name | Empty string | |
 | failureRateThreshold  | 50  | If set to 0, breaker will ignore failures |
 | slowCallRateThreshold  | 100 | If set to 0, breaker will ignore slow calls |
 | slowCallDurationThreshold  | 60000 [ms] | If set to 0, breaker will ignore slow calls |
