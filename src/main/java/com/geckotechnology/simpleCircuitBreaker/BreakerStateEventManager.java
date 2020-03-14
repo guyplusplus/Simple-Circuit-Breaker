@@ -14,6 +14,8 @@ public class BreakerStateEventManager {
 	}
 	
 	public void addBreakerStateEventListener(BreakerStateEventListener listener) {
+		if(listener == null)
+			throw new IllegalArgumentException("listener can not be null");
 		breakerStateEventListeners.add(listener);
 	}
 	
@@ -23,10 +25,12 @@ public class BreakerStateEventManager {
 	 * @return true if the listener was already register, false othewise
 	 */
 	public boolean removeBreakerStateEventListener(BreakerStateEventListener listener) {
+		if(listener == null)
+			throw new IllegalArgumentException("listener can not be null");
 		return breakerStateEventListeners.remove(listener);
 	}
 	
-	public void registerEvent(CircuitBreakerStateChangeEvent event) {
+	void registerEvent(CircuitBreakerStateChangeEvent event) {
 		//check if any listener. If not, then no point adding to the queue
 		if(breakerStateEventListeners.size() == 0)
 			return;
@@ -35,7 +39,7 @@ public class BreakerStateEventManager {
 		}
 	}
 	
-	public void processEventQueue() {
+	void processEventQueue() {
 		CircuitBreakerStateChangeEvent event = null;
 		while(true) {
 			synchronized (eventQueue) {

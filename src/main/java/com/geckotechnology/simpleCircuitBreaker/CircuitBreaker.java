@@ -57,29 +57,29 @@ public class CircuitBreaker {
     	return breakerState;
     }
     
-    void moveToClosedState(String cause) {
+    void moveToClosedState(String details) {
     	breakerState = new BreakerClosedState(this);
-    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), cause));
+    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), details));
     }
 
-    void moveToOpenState(String cause) {
+    void moveToOpenState(String details) {
     	breakerState = new BreakerOpenState(this);
-    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), cause));
+    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), details));
     }
 
-    void moveToHalfOpenState(String cause) {
+    void moveToHalfOpenState(String details) {
     	breakerState = new BreakerHalfOpenState(this);
-    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), cause));
+    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), details));
     }
 
-    void moveToDisabledState(String cause) {
+    void moveToDisabledState(String details) {
     	breakerState = new BreakerDisabledState(this);
-    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), cause));
+    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), details));
     }
 
-    void moveToForcedOpenState(String cause) {
+    void moveToForcedOpenState(String details) {
     	breakerState = new BreakerForcedOpenState(this);
-    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), cause));
+    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), details));
     }
     
     boolean isSlowCall(long callDuration) {
@@ -89,42 +89,24 @@ public class CircuitBreaker {
     	return false;
     }
     
-    boolean isExceedFailureOrSlowRateThreshold(int callCount, int failureCallCount, int slowCallDurationCount) {
-        //calculating various rates, only if it any rate rule can apply
-		//number of calls meets the minimumNumberOfCalls rule
+    /**
+     * This method checks if any ration exceeds threshold. It will call first calculateRates() on the countStats object.
+     * This method assumes minimum number of calls is checked before calling it
+     * @param countStats the 3 counts
+     * @return true if any stat ratio exceeds any threshold
+     */
+    boolean isExceedFailureOrSlowRateThreshold(CountStats countStats) {
+		countStats.calculateRates();
 		if(circuitBreakerConfig.getFailureRateThreshold() > 0) {
-			float failureRate = (float)failureCallCount * 100f / (float)callCount; 
-	        if(failureRate >= circuitBreakerConfig.getFailureRateThreshold()) {
+	        if(countStats.failureRate >= circuitBreakerConfig.getFailureRateThreshold()) {
 	    		return true;
 			}
 		}
 		if(circuitBreakerConfig.getSlowCallRateThreshold() > 0) {
-			float slowCallRate = (float)slowCallDurationCount * 100f / (float)callCount; 
-			if(slowCallRate >= circuitBreakerConfig.getSlowCallRateThreshold()) {
+			if(countStats.slowCallRate >= circuitBreakerConfig.getSlowCallRateThreshold()) {
 	    		return true;
 			}
         }
         return false;
     }
-    
-    String getExpressiveStatsAsReason(int callCount, int failureCallCount, int slowCallDurationCount) {
-		StringBuilder sb = new StringBuilder("stats:{");
-		sb.append("callCount:").append(callCount);
-		sb.append(", ").append("failureCallCount:").append(failureCallCount);
-		if(circuitBreakerConfig.getFailureRateThreshold() > 0) {
-			float failureRate = (float)failureCallCount * 100f / (float)callCount;
-			sb.append(" (failureRate:").append(failureRate);
-			sb.append(", failureRateThreshold:").append(circuitBreakerConfig.getFailureRateThreshold()).append(')');
-		}
-		sb.append(", ").append("slowCallDurationCount:").append(slowCallDurationCount);
-		if(circuitBreakerConfig.getSlowCallRateThreshold() > 0) {
-			float slowCallRate = (float)slowCallDurationCount * 100f / (float)callCount; 
-			sb.append(" (slowCallRate:").append(slowCallRate);
-			sb.append(", slowCallRateThreshold:").append(circuitBreakerConfig.getSlowCallRateThreshold()).append(')');
-		}
-		sb.append("}");
-		return sb.toString();
-
-    }
-
 }

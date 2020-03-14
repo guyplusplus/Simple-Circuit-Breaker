@@ -4,9 +4,7 @@ class BreakerClosedState implements BreakerStateInterface {
 
 	private final CircuitBreaker circuitBreaker;
 	private final int slidingWindowSize;
-    private int callCount = 0;
-    private int failureCallCount = 0;
-    private int slowCallDurationCount = 0;
+	private CountStats countStats;
     private int callCountBuckets[];
     private int failureCallCountBuckets[];
     private int slowCallDurationCountBuckets[];
@@ -14,6 +12,7 @@ class BreakerClosedState implements BreakerStateInterface {
 	
 	BreakerClosedState(CircuitBreaker circuitBreaker) {
 		this.circuitBreaker = circuitBreaker;
+		countStats = new CountStats();
 		slidingWindowSize = circuitBreaker.getCircuitBreakerConfig().getSlidingWindowSize();
 		clearAllBuckets();
 	}
@@ -27,9 +26,7 @@ class BreakerClosedState implements BreakerStateInterface {
 		callCountBuckets = new int[slidingWindowSize];
 		failureCallCountBuckets = new int[slidingWindowSize];
 		slowCallDurationCountBuckets = new int[slidingWindowSize];
-	    callCount = 0;
-	    failureCallCount = 0;
-	    slowCallDurationCount = 0;
+		countStats = new CountStats();
     	lastCallTimestampInSec = (int)(System.currentTimeMillis() / 1000);
 	}
 	
@@ -71,20 +68,19 @@ class BreakerClosedState implements BreakerStateInterface {
 			addToLastCallTimestampInSecBucket(isFailureCall, isSlowCall);
     	}
     	//check now if we need to move to open state
-    	if(callCount >= circuitBreaker.getCircuitBreakerConfig().getMinimumNumberOfCalls()) {
-    		if(circuitBreaker.isExceedFailureOrSlowRateThreshold(callCount, failureCallCount, slowCallDurationCount)) {
-    			circuitBreaker.moveToOpenState("Threshold exceeded. " +
-    					circuitBreaker.getExpressiveStatsAsReason(callCount, failureCallCount, slowCallDurationCount));
+    	if(countStats.callCount >= circuitBreaker.getCircuitBreakerConfig().getMinimumNumberOfCalls()) {
+    		if(circuitBreaker.isExceedFailureOrSlowRateThreshold(countStats)) {
+    			circuitBreaker.moveToOpenState("Threshold exceeded. " + countStats.toExpressiveStatsString());
     		}
     	}
     }
     
     private void addToLastCallTimestampInSecBucket(boolean isFailureCall, boolean isSlowCall) {
-    	callCount++;
+    	countStats.callCount++;
     	if(isFailureCall)
-    		failureCallCount++;
+    		countStats.failureCallCount++;
     	if(isSlowCall)
-    		slowCallDurationCount++;
+    		countStats.slowCallDurationCount++;
     	int lastCallTimestampBucket = lastCallTimestampInSec % slidingWindowSize;
     	callCountBuckets[lastCallTimestampBucket]++;
     	if(isFailureCall)
@@ -95,11 +91,11 @@ class BreakerClosedState implements BreakerStateInterface {
     
     private void clearBucket(int timeInSec) {
     	int bucket = timeInSec % slidingWindowSize;
-    	callCount -= callCountBuckets[bucket];
+    	countStats.callCount -= callCountBuckets[bucket];
 		callCountBuckets[bucket] = 0;
-		failureCallCount -= failureCallCountBuckets[bucket];
+		countStats.failureCallCount -= failureCallCountBuckets[bucket];
 		failureCallCountBuckets[bucket] = 0;
-		slowCallDurationCount -= slowCallDurationCountBuckets[bucket];
+		countStats.slowCallDurationCount -= slowCallDurationCountBuckets[bucket];
 		slowCallDurationCountBuckets[bucket] = 0;
     }
     
@@ -118,10 +114,10 @@ class BreakerClosedState implements BreakerStateInterface {
     		checkFailureCallCount += failureCallCountBuckets[i];
     		checkSlowCallDurationCount += slowCallDurationCountBuckets[i];
     	}
-    	if(checkCallCount != callCount ||
-    			checkFailureCallCount != failureCallCount ||
-    			checkSlowCallDurationCount != slowCallDurationCount) {
-    		System.out.println("actual     callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
+    	if(checkCallCount != countStats.callCount ||
+    			checkFailureCallCount != countStats.failureCallCount ||
+    			checkSlowCallDurationCount != countStats.slowCallDurationCount) {
+    		System.out.println("actual     callCount: " + countStats.callCount + ", failureCallCount: " + countStats.failureCallCount + ", slowCallDurationCount: " + countStats.slowCallDurationCount);
     		System.out.println("calculated callCount: " + checkCallCount + ", failureCallCount: " + checkFailureCallCount + ", slowCallDurationCount: " + checkSlowCallDurationCount);
     		return false;
     	}
@@ -135,10 +131,10 @@ class BreakerClosedState implements BreakerStateInterface {
     boolean testCheckSumForUnitTest(int expectedCallCount, int expectedFailureCallCount, int expectedSlowCallDurationCount) {
     	if(!testCheckSumForUnitTest())
     		return false;
-    	if(callCount != expectedCallCount ||
-    			failureCallCount != expectedFailureCallCount ||
-    			slowCallDurationCount != expectedSlowCallDurationCount) {
-    		System.out.println("actual   callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
+    	if(countStats.callCount != expectedCallCount ||
+    			countStats.failureCallCount != expectedFailureCallCount ||
+    					countStats.slowCallDurationCount != expectedSlowCallDurationCount) {
+    		System.out.println("actual   callCount: " + countStats.callCount + ", failureCallCount: " + countStats.failureCallCount + ", slowCallDurationCount: " + countStats.slowCallDurationCount);
     		System.out.println("expected callCount: " + expectedCallCount + ", failureCallCount: " + expectedFailureCallCount + ", slowCallDurationCount: " + expectedSlowCallDurationCount);
     		return false;
     	}

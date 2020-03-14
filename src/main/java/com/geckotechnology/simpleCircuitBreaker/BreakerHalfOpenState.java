@@ -3,14 +3,13 @@ package com.geckotechnology.simpleCircuitBreaker;
 class BreakerHalfOpenState implements BreakerStateInterface {
 
 	private final CircuitBreaker circuitBreaker;
-    private int callCount = 0;
-    private int failureCallCount = 0;
-    private int slowCallDurationCount = 0;
+	private CountStats countStats;
     private int permittedNumberOfCallsInHalfOpenStateSoFar = 0;
     private long lastOpenCallTimeLimit = 0;
 	
 	BreakerHalfOpenState(CircuitBreaker circuitBreaker) {
 		this.circuitBreaker = circuitBreaker;
+		countStats = new CountStats();
 	}
 	
 	@Override
@@ -36,8 +35,7 @@ class BreakerHalfOpenState implements BreakerStateInterface {
 		}
 		if(System.currentTimeMillis() >= lastOpenCallTimeLimit) {
 			//we are beyond maxDurationOpenInHalfOpenState. Need to go back to CLOSED state
-    		circuitBreaker.moveToClosedState("maxDurationOpenInHalfOpenState is reached. " + 
-    				circuitBreaker.getExpressiveStatsAsReason(callCount, failureCallCount, slowCallDurationCount));
+    		circuitBreaker.moveToClosedState("maxDurationOpenInHalfOpenState is reached. countStats:{" + countStats.toCountStatsString() + "}");
     		return circuitBreaker.isClosedForThisCall();
 		}
 		//situation normal, no more call allowed
@@ -46,7 +44,7 @@ class BreakerHalfOpenState implements BreakerStateInterface {
 
 	@Override
 	public void callFailed(long callDuration) {
-		failureCallCount++;
+		countStats.failureCallCount++;
 		callFailedOrSuccedded(callDuration);
 	}
 
@@ -56,21 +54,19 @@ class BreakerHalfOpenState implements BreakerStateInterface {
 	}
 
     private void callFailedOrSuccedded(long callDuration) {
-    	callCount++;
+    	countStats.callCount++;
     	if(circuitBreaker.isSlowCall(callDuration))
-    		slowCallDurationCount++;
-    	if(callCount < circuitBreaker.getCircuitBreakerConfig().getPermittedNumberOfCallsInHalfOpenState())
+    		countStats.slowCallDurationCount++;
+    	if(countStats.callCount < circuitBreaker.getCircuitBreakerConfig().getPermittedNumberOfCallsInHalfOpenState())
     		return;
     	//callCount reaches permittedNumberOfCallsInHalfOpenState
     	//Time to see if any threshold is exceeded:
     	//  If yes, go to open state
     	//  If no, go to closed state
-    	if(circuitBreaker.isExceedFailureOrSlowRateThreshold(callCount, failureCallCount, slowCallDurationCount))
-    		circuitBreaker.moveToOpenState("Threshold exceeded. " +
-					circuitBreaker.getExpressiveStatsAsReason(callCount, failureCallCount, slowCallDurationCount));
+    	if(circuitBreaker.isExceedFailureOrSlowRateThreshold(countStats))
+    		circuitBreaker.moveToOpenState("Threshold exceeded. countStats:{" + countStats.toExpressiveStatsString() + "}");
     	else {
-    		circuitBreaker.moveToClosedState("Reached permittedNumberOfCallsInHalfOpenState and no threshold exceeded. " +
-    				circuitBreaker.getExpressiveStatsAsReason(callCount, failureCallCount, slowCallDurationCount));
+    		circuitBreaker.moveToClosedState("Reached permittedNumberOfCallsInHalfOpenState and no threshold exceeded. countStats:{" + countStats.toExpressiveStatsString() + "}");
     	}
     }
 }

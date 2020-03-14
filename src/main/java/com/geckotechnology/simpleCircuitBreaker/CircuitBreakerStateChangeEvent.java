@@ -5,12 +5,12 @@ public class CircuitBreakerStateChangeEvent {
 	private String circuitBreakerName;
 	private long creationTimestamp = System.currentTimeMillis();
 	private BreakerStateType newBreakerStateType;
-	private String cause;
+	private String details;
 	
-	CircuitBreakerStateChangeEvent(String circuitBreakerName, BreakerStateType newBreakerStateType, String cause) {
+	CircuitBreakerStateChangeEvent(String circuitBreakerName, BreakerStateType newBreakerStateType, String details) {
 		this.circuitBreakerName = circuitBreakerName;
 		this.newBreakerStateType = newBreakerStateType;
-		this.cause = cause;
+		this.details = details;
 	}
 	
 	public String getCircuitBreakerName() {
@@ -25,16 +25,15 @@ public class CircuitBreakerStateChangeEvent {
 		return newBreakerStateType;
 	}
 	
-	public String getCause() {
-		return cause;
+	public String getDetails() {
+		return details;
 	}
 	
 	public String toString() {
-		StringBuilder sb = new StringBuilder("CircuitBreakerStateChangeEvent:{");
+		StringBuilder sb = new StringBuilder();
 		sb.append("circuitBreakerName:").append(circuitBreakerName);
 		sb.append(", ").append("newBreakerStateType:").append(newBreakerStateType);
-		sb.append(", ").append("cause:\"").append(cause).append("\"");
-		sb.append("}");
+		sb.append(", ").append("details:\"").append(details).append("\"");
 		return sb.toString();
 	}
 }
