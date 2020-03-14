@@ -1,10 +1,7 @@
 package com.geckotechnology.simpleCircuitBreaker;
 
-import java.util.logging.Logger;
-
 class BreakerHalfOpenState implements BreakerStateInterface {
 
-    private static final Logger logger = Logger.getLogger(BreakerHalfOpenState.class.getName());
 	private final CircuitBreaker circuitBreaker;
     private int callCount = 0;
     private int failureCallCount = 0;
@@ -39,8 +36,8 @@ class BreakerHalfOpenState implements BreakerStateInterface {
 		}
 		if(System.currentTimeMillis() >= lastOpenCallTimeLimit) {
 			//we are beyond maxDurationOpenInHalfOpenState. Need to go back to CLOSED state
-    		logger.severe("maxDurationOpenInHalfOpenState is reached. CallCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
-    		circuitBreaker.moveToClosedState();
+    		circuitBreaker.moveToClosedState("maxDurationOpenInHalfOpenState is reached. " + 
+    				circuitBreaker.getExpressiveStatsAsReason(callCount, failureCallCount, slowCallDurationCount));
     		return circuitBreaker.isClosedForThisCall();
 		}
 		//situation normal, no more call allowed
@@ -69,10 +66,11 @@ class BreakerHalfOpenState implements BreakerStateInterface {
     	//  If yes, go to open state
     	//  If no, go to closed state
     	if(circuitBreaker.isExceedFailureOrSlowRateThreshold(callCount, failureCallCount, slowCallDurationCount))
-    		circuitBreaker.moveToOpenState();
+    		circuitBreaker.moveToOpenState("Threshold exceeded. " +
+					circuitBreaker.getExpressiveStatsAsReason(callCount, failureCallCount, slowCallDurationCount));
     	else {
-    		logger.info("callCount: " + callCount + ", failureCallCount: " + failureCallCount + ", slowCallDurationCount: " + slowCallDurationCount);
-    		circuitBreaker.moveToClosedState();
+    		circuitBreaker.moveToClosedState("Reached permittedNumberOfCallsInHalfOpenState and no threshold exceeded. " +
+    				circuitBreaker.getExpressiveStatsAsReason(callCount, failureCallCount, slowCallDurationCount));
     	}
     }
 }

@@ -20,9 +20,9 @@ class BreakerOpenState implements BreakerStateInterface {
 		//check if need to move to half-open
 		if(System.currentTimeMillis() >= openStateEndTimestamp) {
 			if(circuitBreaker.getCircuitBreakerConfig().getPermittedNumberOfCallsInHalfOpenState() == 0)
-				circuitBreaker.moveToClosedState();
+				circuitBreaker.moveToClosedState("WaitDurationInOpenState is over and permittedNumberOfCallsInHalfOpenState=0");
 			else	
-				circuitBreaker.moveToHalfOpenState();
+				circuitBreaker.moveToHalfOpenState("WaitDurationInOpenState is over");
 			return circuitBreaker.isClosedForThisCall();
 		}
 		//no need. Remain in open state

@@ -1,31 +1,46 @@
 package com.geckotechnology.simpleCircuitBreaker;
 
-import java.util.logging.Logger;
-
 public class CircuitBreaker {
 
-    private static final Logger logger = Logger.getLogger(CircuitBreaker.class.getName());
+    private static final String INIT_REASON = "initial state";
     private BreakerStateInterface breakerState;
     private final CircuitBreakerConfig circuitBreakerConfig;
+    private final BreakerStateEventManager breakerStateEventManager;
 
     public CircuitBreaker(CircuitBreakerConfig aCircuitBreakerDefinition) {
     	circuitBreakerConfig = aCircuitBreakerDefinition.clone();
+    	breakerStateEventManager = new BreakerStateEventManager();
     	if(circuitBreakerConfig.getSlidingWindowSize() > 0)
-    		moveToClosedState();
+    		moveToClosedState(INIT_REASON);
     	else if(circuitBreakerConfig.getSlidingWindowSize() == 0)
-    		moveToDisabledState();
+    		moveToDisabledState(INIT_REASON);
     	else if(circuitBreakerConfig.getSlidingWindowSize() == -1)
-    		moveToForcedOpenState();
+    		moveToForcedOpenState(INIT_REASON);
     }
     
-    public synchronized boolean isClosedForThisCall() {
-    	return breakerState.isClosedForThisCall();
+    public BreakerStateEventManager getBreakerStateEventManager() {
+    	return breakerStateEventManager;
     }
-    public synchronized void callFailed(long callDuration) {
-    	breakerState.callFailed(callDuration);
+    
+    public boolean isClosedForThisCall() {
+    	boolean isClosedForThisCall;
+    	synchronized(this) {
+    		isClosedForThisCall = breakerState.isClosedForThisCall();
+    	}
+    	breakerStateEventManager.processEventQueue();
+    	return isClosedForThisCall;
     }
-    public synchronized void callSucceeded(long callDuration) {
-    	breakerState.callSucceeded(callDuration);
+    public void callFailed(long callDuration) {
+    	synchronized(this) {
+    		breakerState.callFailed(callDuration);
+    	}
+    	breakerStateEventManager.processEventQueue();
+    }
+    public void callSucceeded(long callDuration) {
+    	synchronized(this) {
+    		breakerState.callSucceeded(callDuration);
+    	}
+    	breakerStateEventManager.processEventQueue();
     }
     
     //------ Only Private and Default access methods bellow --------------------------
@@ -42,29 +57,29 @@ public class CircuitBreaker {
     	return breakerState;
     }
     
-    void moveToClosedState() {
+    void moveToClosedState(String cause) {
     	breakerState = new BreakerClosedState(this);
-    	logger.info("Breaker state changed to: CLOSED");
+    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), cause));
     }
 
-    void moveToOpenState() {
+    void moveToOpenState(String cause) {
     	breakerState = new BreakerOpenState(this);
-    	logger.info("Breaker state changed to: OPEN");
+    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), cause));
     }
 
-    void moveToHalfOpenState() {
+    void moveToHalfOpenState(String cause) {
     	breakerState = new BreakerHalfOpenState(this);
-    	logger.info("Breaker state changed to: HALF_OPEN");
+    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), cause));
     }
 
-    void moveToDisabledState() {
+    void moveToDisabledState(String cause) {
     	breakerState = new BreakerDisabledState(this);
-    	logger.info("Breaker state changed to: DISABLED");
+    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), cause));
     }
 
-    void moveToForcedOpenState() {
+    void moveToForcedOpenState(String cause) {
     	breakerState = new BreakerForcedOpenState(this);
-    	logger.info("Breaker state changed to: FORCED_OPEN");
+    	breakerStateEventManager.registerEvent(new CircuitBreakerStateChangeEvent(circuitBreakerConfig.getName(), breakerState.getBreakerStateType(), cause));
     }
     
     boolean isSlowCall(long callDuration) {
@@ -80,18 +95,36 @@ public class CircuitBreaker {
 		if(circuitBreakerConfig.getFailureRateThreshold() > 0) {
 			float failureRate = (float)failureCallCount * 100f / (float)callCount; 
 	        if(failureRate >= circuitBreakerConfig.getFailureRateThreshold()) {
-				logger.warning("High failureRate: " + failureRate + "%, failureCallCount: " + failureCallCount + ", callCount: " + callCount);
 	    		return true;
 			}
 		}
 		if(circuitBreakerConfig.getSlowCallRateThreshold() > 0) {
 			float slowCallRate = (float)slowCallDurationCount * 100f / (float)callCount; 
 			if(slowCallRate >= circuitBreakerConfig.getSlowCallRateThreshold()) {
-	    		logger.warning("High slowCallRate: " + slowCallRate + "%, slowCallDurationCount: " + slowCallDurationCount + ", callCount: " + callCount);
 	    		return true;
 			}
         }
         return false;
+    }
+    
+    String getExpressiveStatsAsReason(int callCount, int failureCallCount, int slowCallDurationCount) {
+		StringBuilder sb = new StringBuilder("stats:{");
+		sb.append("callCount:").append(callCount);
+		sb.append(", ").append("failureCallCount:").append(failureCallCount);
+		if(circuitBreakerConfig.getFailureRateThreshold() > 0) {
+			float failureRate = (float)failureCallCount * 100f / (float)callCount;
+			sb.append(" (failureRate:").append(failureRate);
+			sb.append(", failureRateThreshold:").append(circuitBreakerConfig.getFailureRateThreshold()).append(')');
+		}
+		sb.append(", ").append("slowCallDurationCount:").append(slowCallDurationCount);
+		if(circuitBreakerConfig.getSlowCallRateThreshold() > 0) {
+			float slowCallRate = (float)slowCallDurationCount * 100f / (float)callCount; 
+			sb.append(" (slowCallRate:").append(slowCallRate);
+			sb.append(", slowCallRateThreshold:").append(circuitBreakerConfig.getSlowCallRateThreshold()).append(')');
+		}
+		sb.append("}");
+		return sb.toString();
+
     }
 
 }
