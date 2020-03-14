@@ -21,9 +21,9 @@ public class ForceOpenStateTest {
 			threads[t] = new Thread() {
 				public void run() {
 					for(int i = 0; i<LOOP_COUNT; i++) {
-						assertTrue(circuitBreaker.getBreakerState() instanceof BreakerForcedOpenState);
+						assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.FORCED_OPEN);
 						assertFalse(circuitBreaker.isClosedForThisCall());
-						assertTrue(circuitBreaker.getBreakerState() instanceof BreakerForcedOpenState);
+						assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.FORCED_OPEN);
 						TestUtils.sleep(SLEEP_TIME);
 					}					
 				}

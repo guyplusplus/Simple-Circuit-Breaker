@@ -21,12 +21,12 @@ public class DisabledStateTest {
 			threads[t] = new Thread() {
 				public void run() {
 					for(int i = 0; i<LOOP_COUNT; i++) {
-						assertTrue(circuitBreaker.getBreakerState() instanceof BreakerDisabledState);
+						assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.DISABLED);
 						assertTrue(circuitBreaker.isClosedForThisCall());
-						assertTrue(circuitBreaker.getBreakerState() instanceof BreakerDisabledState);
+						assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.DISABLED);
 						TestUtils.sleep(SLEEP_TIME);
 						circuitBreaker.callSucceeded(SLEEP_TIME);
-						assertTrue(circuitBreaker.getBreakerState() instanceof BreakerDisabledState);
+						assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.DISABLED);
 					}					
 				}
 			};
