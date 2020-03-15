@@ -1,17 +1,9 @@
 package com.geckotechnology.simpleCircuitBreaker;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Test;
 
 public class DemoApp {
 	
