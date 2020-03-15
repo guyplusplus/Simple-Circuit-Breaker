@@ -11,7 +11,7 @@ public class DemoApp {
 	private static final int NB_THREADS = 5;
 	private static final float ACTUAL_FAILURE_RATIO_RANGE_PCT = 70;
 	private static final long ACTUAL_CALL_DURATION_RANGE_MS = 1500;
-	private static final long WAIT_BETWEEN_LOOP_MS = 500;
+	private static final long WAIT_BETWEEN_LOOP_RANGE_MS = 1000;
 
 	private CircuitBreaker circuitBreaker;
 
@@ -52,10 +52,11 @@ public class DemoApp {
 			new Thread() {
 				@Override
 				public void run() {
+					long duration;
 					while(true) {	
 						if(circuitBreaker.isClosedForThisCall()) {
 							boolean willFail = (rd.nextInt(1000) > 10 * ACTUAL_FAILURE_RATIO_RANGE_PCT);
-							long duration = rd.nextInt((int)ACTUAL_CALL_DURATION_RANGE_MS); 
+							duration = rd.nextInt((int)ACTUAL_CALL_DURATION_RANGE_MS); 
 							if(willFail) {
 								System.out.println("[" + threadId.get() + "] Breaker is closed. Simulating callFailed with duration: " + duration);
 								TestUtils.sleep(duration);
@@ -70,7 +71,8 @@ public class DemoApp {
 						else {
 							System.out.println("[" + threadId.get() + "] Breaker is opened. Pass...");
 						}
-						TestUtils.sleep(WAIT_BETWEEN_LOOP_MS);
+						duration = rd.nextInt((int)WAIT_BETWEEN_LOOP_RANGE_MS); 
+						TestUtils.sleep(duration);
 					}
 				}
 			}.start();
