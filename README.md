@@ -86,7 +86,7 @@ Registered EventListeners are informed by the thread performing the business log
 ## Event Listeners
 The library supports adding event listeners. Registration and event consumption is straight forward.
 
-```
+```java
 circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new BreakerStateEventListener() {
     @Override
     public void onCircuitBreakerStateChangeEvent(CircuitBreakerStateChangeEvent event) {
