@@ -48,7 +48,7 @@ loop
 
 **Important**: `callSucceeded()` or `callFailed()` must always be invoked after `isClosedForThisCall()`. Otherwise breaker in HALF_OPEN state will never move to another state, waiting for the results of the permittedNumberOfCallsInHalfOpenState calls.
 
-To avoid this situation a new property called maxDurationOpenInHalfOpenState is introduced. In HALF_OPEN state, after permittedNumberOfCallsInHalfOpenState calls (`isClosedForThisCall()` returns true), all its subsequent calls (`isClosedForThisCall()` returns false) should not be executed as the circuit is opened. If this situation lasts longer than maxDurationOpenInHalfOpenState ms, the breaker goes back automatically to the CLOSED state.
+To avoid this situation a new property called maxDurationOpenInHalfOpenState is introduced. In HALF_OPEN state, after permittedNumberOfCallsInHalfOpenState calls to `isClosedForThisCall()` (which returns true), all its subsequent calls (which returns false) means no business logic should be executed as the circuit is opened. If this open circuit situation lasts longer than maxDurationOpenInHalfOpenState ms, the breaker goes back automatically to the CLOSED state.
 
 ## Circuit Breaker Configuration using Properties
 The circuit breaker can easily be configured using `java.util.Properties`, possibly adding prefix, for example:
@@ -65,6 +65,7 @@ CircuitBreaker circuitBreaker = new CircuitBreaker(config);
 Where the file `my-breaker.config` contains values to override the default values:
 
 ```
+SVC1.name=ABC
 SVC1.failureRateThreshold=20
 SVC1.slidingWindowSize=150
 ```
@@ -83,67 +84,38 @@ The code has 3 methods with a synchronized portion, it has minimum impact to ini
 Registered EventListeners are informed by the thread performing the business logic, but outside any synchronized code. 
 
 ## Event Listeners
-The library supports simple event listener. Registration and consumption is straight forward.
+The library supports adding event listeners. Registration and event consumption is straight forward.
 
 ```
 circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new BreakerStateEventListener() {
-	@Override
-	public void onCircuitBreakerStateChangeEvent(CircuitBreakerStateChangeEvent event) {
-		logger.warning("CircuitBreaker state changed. " + event);
-		...
-	}
+    @Override
+    public void onCircuitBreakerStateChangeEvent(CircuitBreakerStateChangeEvent event) {
+        logger.warning("CircuitBreaker state changed. " + event);
+        ...
+    }
 });
-
 ```
 
-## Log File Output
-Log file contains information about the breaker state change as well as the reason and simple statistics. Here is simple content. Log monitoring can be used to capture events.
+## Events Triggers
+Events contain information about the breaker state change as well as the reason and simple statistics. Here is simple content when events are logged to console.
 
 ```
-Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
-INFO: CircuitBreakerConfig:
-Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
-INFO: 	failureRateThreshold: 55.1
-Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
-INFO: 	slowCallRateThreshold: 40.0
-Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
-INFO: 	slowCallDurationThreshold: 600
-Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
-INFO: 	permittedNumberOfCallsInHalfOpenState: 3
-Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
-INFO: 	slidingWindowSize: 30
-Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
-INFO: 	minimumNumberOfCalls: 6
-Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreakerConfig logInfoConfigProperties
-INFO: 	waitDurationOpenedState: 2000
-Mar. 07, 2020 6:56:21 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToClosedState
-INFO: Breaker state changed to: CLOSED
+config:{name:ABC, failureRateThreshold:75.1, slowCallRateThreshold:45.0, slowCallDurationThreshold:528, permittedNumberOfCallsInHalfOpenState:5, slidingWindowSize:30, minimumNumberOfCalls:20, waitDurationOpenedState:2000, maxDurationOpenInHalfOpenState:1100}
 ...
 ...
-Mar. 07, 2020 6:56:22 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker isExceedFailureOrSlowRateThreshold
-WARNING: High slowCallRate: 66.666664%, slowCallDurationCount: 4, callCount: 6
-Mar. 07, 2020 6:56:22 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToOpenState
-INFO: Breaker state changed to: OPEN
+CircuitBreaker state changed. circuitBreakerName:ABC, newBreakerStateType:OPEN, creationTimestamp:1584250428589, details:"Threshold exceeded. countStats:{callCount:80, failureCallCount:26, slowCallDurationCount:36, failureRate:32.5, slowCallRate:45.0}"
 ...
 ...
-Mar. 07, 2020 6:56:24 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToHalfOpenState
-INFO: Breaker state changed to: HALF_OPEN
+CircuitBreaker state changed. circuitBreakerName:ABC, newBreakerStateType:HALF_OPEN, creationTimestamp:1584250430632, details:"WaitDurationInOpenState is over"
 ...
 ...
-Mar. 07, 2020 6:56:25 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker isExceedFailureOrSlowRateThreshold
-WARNING: High slowCallRate: 66.666664%, slowCallDurationCount: 2, callCount: 3
-Mar. 07, 2020 6:56:25 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToOpenState
-INFO: Breaker state changed to: OPEN
+CircuitBreaker state changed. circuitBreakerName:ABC, newBreakerStateType:OPEN, creationTimestamp:1584250432231, details:"Reached permittedNumberOfCallsInHalfOpenState and threshold exceeded. countStats:{callCount:5, failureCallCount:1, slowCallDurationCount:4, failureRate:20.0, slowCallRate:80.0}"
 ...
 ...
-Mar. 07, 2020 6:56:27 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToHalfOpenState
-INFO: Breaker state changed to: HALF_OPEN
+CircuitBreaker state changed. circuitBreakerName:ABC, newBreakerStateType:HALF_OPEN, creationTimestamp:1584250434265, details:"WaitDurationInOpenState is over"
 ...
 ...
-Mar. 07, 2020 6:56:29 PM com.geckotechnology.simpleCircuitBreaker.BreakerHalfOpenState callFailedOrSuccedded
-INFO: callCount: 3, failureCallCount: 1, slowCallDurationCount: 1
-Mar. 07, 2020 6:56:29 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToClosedState
-INFO: Breaker state changed to: CLOSED
+CircuitBreaker state changed. circuitBreakerName:ABC, newBreakerStateType:CLOSED, creationTimestamp:1584250435804, details:"Reached permittedNumberOfCallsInHalfOpenState and no threshold exceeded. countStats:{callCount:5, failureCallCount:3, slowCallDurationCount:2, failureRate:60.0, slowCallRate:40.0}"
 ...
 ...
 ```
@@ -153,25 +125,16 @@ Another example showing the behavior of maxDurationOpenInHalfOpenState.
 ```
 ...
 ...
-Mar. 08, 2020 5:02:27 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToClosedState
-INFO: Breaker state changed to: CLOSED
+CircuitBreaker state changed. circuitBreakerName:ABC, newBreakerStateType:CLOSED, creationTimestamp:1584250604694, details:"Reached permittedNumberOfCallsInHalfOpenState and no threshold exceeded. countStats:{callCount:5, failureCallCount:0, slowCallDurationCount:2, failureRate:0.0, slowCallRate:40.0}"
 ...
 ...
-Mar. 08, 2020 5:02:52 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker isExceedFailureOrSlowRateThreshold
-WARNING: High slowCallRate: 45.299145%, slowCallDurationCount: 53, callCount: 117
-Mar. 08, 2020 5:02:52 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToOpenState
-INFO: Breaker state changed to: OPEN
+CircuitBreaker state changed. circuitBreakerName:ABC, newBreakerStateType:OPEN, creationTimestamp:1584250609427, details:"Threshold exceeded. countStats:{callCount:20, failureCallCount:3, slowCallDurationCount:10, failureRate:15.0, slowCallRate:50.0}"
 ...
 ...
-Mar. 08, 2020 5:02:54 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToHalfOpenState
-INFO: Breaker state changed to: HALF_OPEN
+CircuitBreaker state changed. circuitBreakerName:ABC, newBreakerStateType:HALF_OPEN, creationTimestamp:1584250611443, details:"WaitDurationInOpenState is over"
 ...
 ...
-Mar. 08, 2020 5:02:55 PM com.geckotechnology.simpleCircuitBreaker.BreakerHalfOpenState isClosedForThisCall
-WARNING: maxDurationOpenInHalfOpenState is reached. CallCount: 4, failureCallCount: 1, slowCallDurationCount: 1
-Mar. 08, 2020 5:02:55 PM com.geckotechnology.simpleCircuitBreaker.CircuitBreaker moveToClosedState
-INFO: Breaker state changed to: CLOSED
+CircuitBreaker state changed. circuitBreakerName:ABC, newBreakerStateType:CLOSED, creationTimestamp:1584250613133, details:"MaxDurationOpenInHalfOpenState is over. countStats:{callCount:4, failureCallCount:0, slowCallDurationCount:2}"
 ...
 ...
 ```
-
