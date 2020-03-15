@@ -1,6 +1,6 @@
 # Simple Circuit Breaker
 
-This library is a Simple Circuit Breaker for JAVA 7 and above. It is directly inspired by [Resilience4j](https://resilience4j.readme.io/docs/circuitbreaker) in term of functionality and parameters. Only TIME_BASED sliding window is implemented in the current release.
+This library is a fully featured Simple Circuit Breaker for JAVA 7 and above. It is directly inspired by [Resilience4j](https://resilience4j.readme.io/docs/circuitbreaker) in term of functionality and parameters. Only TIME_BASED sliding window is implemented in the current release.
 
 It supports the 5 states:
   - OPEN
@@ -96,8 +96,7 @@ circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new Br
 });
 ```
 
-## Events Triggers
-Events contain information about the breaker state change as well as the reason and simple statistics. Here is simple content when events are logged to console.
+Events contain information about the breaker state change as well as the reason with statistics. Here is content when events are logged to console.
 
 ```
 config:{name:ABC, failureRateThreshold:75.1, slowCallRateThreshold:45.0, slowCallDurationThreshold:528, permittedNumberOfCallsInHalfOpenState:5, slidingWindowSize:30, minimumNumberOfCalls:20, waitDurationOpenedState:2000, maxDurationOpenInHalfOpenState:1100}
