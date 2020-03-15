@@ -35,7 +35,7 @@ class BreakerHalfOpenState implements BreakerStateInterface {
 		}
 		if(System.currentTimeMillis() >= lastOpenCallTimeLimit) {
 			//we are beyond maxDurationOpenInHalfOpenState. Need to go back to CLOSED state
-    		circuitBreaker.moveToClosedState("maxDurationOpenInHalfOpenState is reached. countStats:{" + countStats.toCountStatsString() + "}");
+    		circuitBreaker.moveToClosedState("MaxDurationOpenInHalfOpenState is over. countStats:{" + countStats.toCountStatsString() + "}");
     		return circuitBreaker.isClosedForThisCall();
 		}
 		//situation normal, no more call allowed

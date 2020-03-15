@@ -70,7 +70,7 @@ SVC1.slidingWindowSize=150
 ```
 
 ## Overhead
-Load test, included in the JUnit tests, shows an overhead less than 0.05ms per wrapped logic.
+Load test, included in the JUnit tests, shows an overhead less than 0.05ms per wrapped logic. It is actually very difficult to measure as this time is very short and sensitive to server load and other factors like GC.
 
 The load test is based on 4 concurrent threads running with a CLOSED circuit breaker, with a wrapped logic around 6.5ms.
 
