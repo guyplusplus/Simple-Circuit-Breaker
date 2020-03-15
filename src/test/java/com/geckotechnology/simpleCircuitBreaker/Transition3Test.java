@@ -108,5 +108,8 @@ public class Transition3Test {
 		TestUtils.sleep(3000);
 
 		assertFalse(circuitBreaker.isClosedForThisCall());
+		
+		//the end. Queue is empty
+		assertEquals(circuitBreaker.getBreakerStateEventManager().getEventQueueLength(), 0);
 	}
 }

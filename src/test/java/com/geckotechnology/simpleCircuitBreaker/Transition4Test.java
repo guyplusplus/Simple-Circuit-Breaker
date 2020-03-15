@@ -103,5 +103,8 @@ public class Transition4Test {
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callFailed(10);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
+		
+		//the end. Queue is empty
+		assertEquals(circuitBreaker.getBreakerStateEventManager().getEventQueueLength(), 0);
 	}
 }

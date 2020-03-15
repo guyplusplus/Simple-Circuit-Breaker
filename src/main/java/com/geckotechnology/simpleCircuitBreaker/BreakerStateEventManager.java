@@ -30,6 +30,8 @@ public class BreakerStateEventManager {
 		return breakerStateEventListeners.remove(listener);
 	}
 	
+    //------ Only Private and Default access methods bellow --------------------------
+    
 	void registerEvent(CircuitBreakerStateChangeEvent event) {
 		//check if any listener. If not, then no point adding to the queue
 		if(breakerStateEventListeners.size() == 0)
@@ -58,5 +60,9 @@ public class BreakerStateEventManager {
 				}
 			}
 		}
+	}
+	
+	int getEventQueueLength() {
+		return eventQueue.size();
 	}
 }

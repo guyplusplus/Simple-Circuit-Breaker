@@ -216,5 +216,8 @@ public class Transition1Test {
 		lastEvent = null;
 		circuitBreaker.callFailed(10);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
+		
+		//the end. Queue is empty
+		assertEquals(circuitBreaker.getBreakerStateEventManager().getEventQueueLength(), 0);
 	}
 }
