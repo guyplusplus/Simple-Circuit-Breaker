@@ -1,5 +1,7 @@
 package com.geckotechnology.simpleCircuitBreaker;
 
+import static org.junit.Assert.assertEquals;
+
 public class TestUtils {
 
 	public static void sleep(long ms) {
@@ -23,17 +25,29 @@ public class TestUtils {
 		return true;
 	}
 	
+	/**
+	 * The code will lock the circuitBreaker for the duration of the validation
+	 * @param circuitBreaker
+	 * @return
+	 */
 	public static boolean validateAggregatedCountStatsMatches(CircuitBreaker circuitBreaker) {
 		synchronized(circuitBreaker) {
+			assertEquals(circuitBreaker.getBreakerState(), BreakerStateType.CLOSED);
 			BreakerClosedState breakerClosedState = (BreakerClosedState)circuitBreaker.getBreakerState();
 			CountStats agrregatedCountStats = breakerClosedState.calculateAggregatedCountStatsForUnitTest();
 			return isCountStatsEqual(agrregatedCountStats, breakerClosedState.getCountStats());
 		}
 	}
 	
+	/**
+	 * The code will lock the circuitBreaker for the duration of the validation
+	 * @param circuitBreaker
+	 * @return
+	 */
 	public static boolean validateAggregatedCountStatsMatches(CircuitBreaker circuitBreaker,
 			int expectedCallCount, int expectedFailureCallCount, int expectedSlowCallDurationCount) {
 		synchronized(circuitBreaker) {
+			assertEquals(circuitBreaker.getBreakerState(), BreakerStateType.CLOSED);
 			BreakerClosedState breakerClosedState = (BreakerClosedState)circuitBreaker.getBreakerState();
 			//step 1: ensure that sum(all buckets) = current countStats
 			CountStats agrregatedCountStats = breakerClosedState.calculateAggregatedCountStatsForUnitTest();
