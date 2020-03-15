@@ -20,7 +20,7 @@ public class Transition1Test {
 		config.setWaitDurationInOpenState(4000);
 		config.setMinimumNumberOfCalls(3);
 		config.setPermittedNumberOfCallsInHalfOpenState(2);
-		config.setSlowCallDurationThreshold(100);
+		config.setSlowCallDurationThreshold(1);
 		config.setSlowCallRateThreshold(0);
 		config.setMaxDurationOpenInHalfOpenState(5000);
 		CircuitBreaker circuitBreaker = new CircuitBreaker(config);
