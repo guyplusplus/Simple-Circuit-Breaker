@@ -34,7 +34,7 @@ public class CircuitBreakerConfig {
 	 * Constructor where prefix is empty
 	 */
 	public CircuitBreakerConfig(Properties props) {
-		this(null, props);
+		this("", props);
 	}
 	
 	/**
