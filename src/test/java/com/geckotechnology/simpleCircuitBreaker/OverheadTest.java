@@ -55,12 +55,13 @@ public class OverheadTest {
 			};
 			threads[t].start();
 		}
-		for(int t = 0; t<THREAD_COUNT; t++)
+		for(int t = 0; t<THREAD_COUNT; t++) {
 			try {
 				threads[t].join();
 			} catch (InterruptedException e) {
 				fail("InterruptedException catched: " + e);
 			}
+		}
 		//with breaker
 		CircuitBreakerConfig config = new CircuitBreakerConfig();
 		config.setSlidingWindowSize(10);

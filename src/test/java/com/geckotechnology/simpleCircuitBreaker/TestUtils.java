@@ -21,6 +21,11 @@ public class TestUtils {
 		return true;
 	}
 	
+	public static boolean validateAggregatedCountStatsMatches(BreakerClosedState breakerClosedState) {
+		CountStats agrregatedCountStats = breakerClosedState.calculateAggregatedCountStatsForUnitTest();
+		return isCountStatsEqual(agrregatedCountStats, breakerClosedState.getCountStats());
+	}
+	
 	public static boolean validateAggregatedCountStatsMatches(BreakerClosedState breakerClosedState,
 			int expectedCallCount, int expectedFailureCallCount, int expectedSlowCallDurationCount) {
 		//step 1: ensure that sum(all buckets) = current countStats

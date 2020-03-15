@@ -33,6 +33,7 @@ public class CircuitBreakerStateChangeEvent {
 		StringBuilder sb = new StringBuilder();
 		sb.append("circuitBreakerName:").append(circuitBreakerName);
 		sb.append(", ").append("newBreakerStateType:").append(newBreakerStateType);
+		sb.append(", ").append("creationTimestamp:").append(creationTimestamp);
 		sb.append(", ").append("details:\"").append(details).append("\"");
 		return sb.toString();
 	}
