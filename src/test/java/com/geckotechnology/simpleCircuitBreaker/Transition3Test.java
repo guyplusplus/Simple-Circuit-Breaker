@@ -10,7 +10,7 @@ public class Transition3Test {
 
 	/**
 	 * Test transitions : closed -> open -> half-open for ever with maxDurationOpenInHalfOpenState 0
-	 * Event type: call failure
+	 * Event type: call slow
 	 */
 	@Test
 	public void test1() {
