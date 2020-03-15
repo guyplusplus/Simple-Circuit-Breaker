@@ -32,7 +32,7 @@ public class TestUtils {
 	 */
 	public static boolean validateAggregatedCountStatsMatches(CircuitBreaker circuitBreaker) {
 		synchronized(circuitBreaker) {
-			assertEquals(circuitBreaker.getBreakerState(), BreakerStateType.CLOSED);
+			assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
 			BreakerClosedState breakerClosedState = (BreakerClosedState)circuitBreaker.getBreakerState();
 			CountStats agrregatedCountStats = breakerClosedState.calculateAggregatedCountStatsForUnitTest();
 			return isCountStatsEqual(agrregatedCountStats, breakerClosedState.getCountStats());
@@ -47,7 +47,7 @@ public class TestUtils {
 	public static boolean validateAggregatedCountStatsMatches(CircuitBreaker circuitBreaker,
 			int expectedCallCount, int expectedFailureCallCount, int expectedSlowCallDurationCount) {
 		synchronized(circuitBreaker) {
-			assertEquals(circuitBreaker.getBreakerState(), BreakerStateType.CLOSED);
+			assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
 			BreakerClosedState breakerClosedState = (BreakerClosedState)circuitBreaker.getBreakerState();
 			//step 1: ensure that sum(all buckets) = current countStats
 			CountStats agrregatedCountStats = breakerClosedState.calculateAggregatedCountStatsForUnitTest();
