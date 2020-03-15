@@ -30,7 +30,7 @@ name is a new property that is used for logging purpose. If specified, each line
 
 
 ## Sample Code
-Pseudo-code should look like this:
+Pseudo-code should look like bellow. Actual simple code can be found in [DemoApp](https://github.com/guyplusplus/Simple-Circuit-Breaker/blob/master/src/test/java/com/geckotechnology/simpleCircuitBreaker/DemoApp.java).
 
 ```
 CircuitBreakerConfig config = new CircuitBreakerConfig();
@@ -84,7 +84,7 @@ The code has 3 methods with a synchronized portion, it has minimum impact to ini
 Registered EventListeners are informed by the thread performing the business logic, but outside any synchronized code. 
 
 ## Event Listeners
-The library supports adding event listeners. Registration and event consumption is straight forward.
+The library supports listening for breaker state events. Registration and event consumption is straight forward. [DemoApp](https://github.com/guyplusplus/Simple-Circuit-Breaker/blob/master/src/test/java/com/geckotechnology/simpleCircuitBreaker/DemoApp.java) contains an example.
 
 ```java
 circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new BreakerStateEventListener() {

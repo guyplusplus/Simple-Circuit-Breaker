@@ -20,7 +20,7 @@ public class DemoApp {
 		new Thread() {
 			@Override
 			public void run() {
-				new DemoApp().test();				
+				new DemoApp().test();
 			}
 		}.start();
 	}
@@ -35,9 +35,11 @@ public class DemoApp {
 			System.out.println("config:{" + config.toString() + "}");
 			circuitBreaker = new CircuitBreaker(config);
 		} catch (Exception e) {
+			//failed to load the configuration
 			e.printStackTrace();
 			System.exit(-1);
 		}
+		//add a simple listener to log events to console
 		circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new BreakerStateEventListener() {
 			@Override
 			public void onCircuitBreakerStateChangeEvent(CircuitBreakerStateChangeEvent event) {
@@ -54,7 +56,7 @@ public class DemoApp {
 				@Override
 				public void run() {
 					long duration;
-					while(true) {	
+					while(true) {
 						if(circuitBreaker.isClosedForThisCall()) {
 							boolean willFail = (rd.nextInt(1000) > 10 * ACTUAL_FAILURE_RATIO_RANGE_PCT);
 							duration = rd.nextInt((int)ACTUAL_CALL_DURATION_RANGE_MS); 
@@ -67,7 +69,7 @@ public class DemoApp {
 								System.out.println("[" + threadId.get() + "] Breaker is closed. Simulating callSucceeded with duration: " + duration);
 								TestUtils.sleep(duration);
 								circuitBreaker.callSucceeded(duration);
-							}					
+							}
 						}
 						else {
 							System.out.println("[" + threadId.get() + "] Breaker is opened. Pass...");
