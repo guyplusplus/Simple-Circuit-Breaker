@@ -64,4 +64,15 @@ public class TestUtils {
 			return isCountStatsEqual(expectedCountStats, breakerClosedState.getCountStats());
 		}
 	}
+	
+	public static int countChars(String s, char c) {
+		if(s == null)
+			return 0;
+		int l = s.length();
+		int cnt = 0;
+		for(int i = 0; i<l; i++)
+			if(s.charAt(i) == c)
+				cnt++;
+		return cnt;
+	}
 }

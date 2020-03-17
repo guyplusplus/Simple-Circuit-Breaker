@@ -24,6 +24,17 @@ public class CircuitBreakerConfigTest {
 		assertEquals(config.getMinimumNumberOfCalls(), 10);
 		assertEquals(config.getWaitDurationInOpenState(), 60000);
 		assertEquals(config.getMaxDurationOpenInHalfOpenState(), 120000);
+		String str = config.toString() + ",";
+		assertTrue(str.indexOf("name:,") != -1);
+		assertTrue(str.indexOf("failureRateThreshold:50.0,") != -1);
+		assertTrue(str.indexOf("slowCallRateThreshold:100.0,") != -1);
+		assertTrue(str.indexOf("slowCallDurationThreshold:60000,") != -1);
+		assertTrue(str.indexOf("permittedNumberOfCallsInHalfOpenState:10,") != -1);
+		assertTrue(str.indexOf("slidingWindowSize:100,") != -1);
+		assertTrue(str.indexOf("minimumNumberOfCalls:10,") != -1);
+		assertTrue(str.indexOf("waitDurationInOpenState:60000,") != -1);
+		assertTrue(str.indexOf("maxDurationOpenInHalfOpenState:120000,") != -1);
+		assertEquals(TestUtils.countChars(str, ','), 9); //9 variables
 	}
 	
 	@Test
