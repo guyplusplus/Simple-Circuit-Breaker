@@ -100,7 +100,7 @@ public class CircuitBreakerConfig {
 		sb.append(", ").append("permittedNumberOfCallsInHalfOpenState:").append(permittedNumberOfCallsInHalfOpenState);
 		sb.append(", ").append("slidingWindowSize:").append(slidingWindowSize);
 		sb.append(", ").append("minimumNumberOfCalls:").append(minimumNumberOfCalls);
-		sb.append(", ").append("waitDurationOpenedState:").append(waitDurationInOpenState);
+		sb.append(", ").append("waitDurationInOpenState:").append(waitDurationInOpenState);
 		sb.append(", ").append("maxDurationOpenInHalfOpenState:").append(maxDurationOpenInHalfOpenState);
 		return sb.toString();
 	}
