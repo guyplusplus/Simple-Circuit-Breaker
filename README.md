@@ -19,13 +19,13 @@ name is a new property that is used for logging purpose. If specified, each line
 | Config property | Default Value | Special Values |
 | ------------- | ------------- | --------|
 | name | Empty string | |
-| failureRateThreshold  | 50  | If set to 0, breaker will ignore failures |
-| slowCallRateThreshold  | 100 | If set to 0, breaker will ignore slow calls |
-| slowCallDurationThreshold  | 60000 [ms] | If set to 0, breaker will ignore slow calls |
-| permittedNumberOfCallsInHalfOpenState  | 10 | 0 to move from open to closed state directly, without any half-open state |
-| slidingWindowSize  | 100 [s] | 0 to set breaker in DISABLED state, -1 to set breaker in FORCED_OPEN state |
-| minimumNumberOfCalls  | 10 | |
-| waitDurationInOpenState  | 60000 [ms] | |
+| failureRateThreshold | 50 | If set to 0, breaker will ignore failures |
+| slowCallRateThreshold | 100 | If set to 0, breaker will ignore slow calls |
+| slowCallDurationThreshold | 60000 [ms] | If set to 0, breaker will ignore slow calls |
+| permittedNumberOfCallsInHalfOpenState | 10 | 0 to move from open to closed state directly, without any half-open state |
+| slidingWindowSize | 100 [s] | 0 to set breaker in DISABLED state, -1 to set breaker in FORCED_OPEN state |
+| minimumNumberOfCalls | 10 | |
+| waitDurationInOpenState | 60000 [ms] | |
 | maxDurationOpenInHalfOpenState | 120000 [ms] | If set to 0, the breaker in HALF_OPEN state will wait forever for the outcome (fail or success) of all the permittedNumberOfCallsInHalfOpenState calls |
 
 
