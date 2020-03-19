@@ -16,6 +16,7 @@ public class OverheadTest {
 		
 	@Before
 	public void warmUp() {
+		TestUtils.outputJVMInfo();
 		System.out.println("Starting warmUp");
 		int array[] = createArray();
 		for(int i = 0; i<LOOP_TEST_WARMUP; i++)

@@ -17,7 +17,7 @@ public class DemoApp {
 	private CircuitBreaker circuitBreaker;
 
 	public static void main(String[] args) {
-		System.out.println("java.version: " + System.getProperty("java.version"));
+		TestUtils.outputJVMInfo();
 		new Thread() {
 			@Override
 			public void run() {

@@ -75,4 +75,10 @@ public class TestUtils {
 				cnt++;
 		return cnt;
 	}
+	
+	public static void outputJVMInfo() {
+		System.out.println("java.vendor:          " + System.getProperty("java.vendor"));
+		System.out.println("java.version:         " + System.getProperty("java.version"));
+		System.out.println("java.runtime.version: " + System.getProperty("java.runtime.version"));
+	}
 }
