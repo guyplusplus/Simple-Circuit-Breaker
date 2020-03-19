@@ -1,16 +1,16 @@
 package com.geckotechnology.simpleCircuitBreaker;
 
-import java.util.LinkedList;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BreakerStateEventManager {
 	
 	private final CopyOnWriteArrayList<BreakerStateEventListener> breakerStateEventListeners;
-	private final LinkedList<CircuitBreakerStateChangeEvent> eventQueue;
+	private static final ExecutorService eventProcessorExecutor = Executors.newSingleThreadExecutor();
 	
 	public BreakerStateEventManager() {
 		breakerStateEventListeners = new CopyOnWriteArrayList<BreakerStateEventListener>();
-		eventQueue = new LinkedList<CircuitBreakerStateChangeEvent>();
 	}
 	
 	public void addBreakerStateEventListener(BreakerStateEventListener listener) {
@@ -32,37 +32,22 @@ public class BreakerStateEventManager {
 	
     //------ Only Private and Default access methods bellow --------------------------
     
-	void registerEvent(CircuitBreakerStateChangeEvent event) {
+	void registerEvent(final CircuitBreakerStateChangeEvent event) {
 		//check if any listener. If not, then no point adding to the queue
 		if(breakerStateEventListeners.size() == 0)
 			return;
-		synchronized (eventQueue) {
-			eventQueue.addLast(event);
-		}
-	}
-	
-	void processEventQueue() {
-		CircuitBreakerStateChangeEvent event = null;
-		while(true) {
-			synchronized (eventQueue) {
-				event = eventQueue.pollFirst();
+		eventProcessorExecutor.submit(new Runnable() {
+			@Override
+			public void run() {
+				for(BreakerStateEventListener listener:breakerStateEventListeners) {
+					try {
+						listener.onCircuitBreakerStateChangeEvent(event);
+					}
+					catch(Exception e) {
+						e.printStackTrace();
+					}
+				}				
 			}
-			if(event == null)
-				//no more event in the queue
-				return;
-			//inform all listeners
-			for(BreakerStateEventListener listener:breakerStateEventListeners) {
-				try {
-					listener.onCircuitBreakerStateChangeEvent(event);
-				}
-				catch(Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-	
-	int getEventQueueLength() {
-		return eventQueue.size();
+		});
 	}
 }

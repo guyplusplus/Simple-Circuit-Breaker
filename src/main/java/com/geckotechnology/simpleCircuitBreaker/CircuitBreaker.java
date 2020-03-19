@@ -22,25 +22,14 @@ public class CircuitBreaker {
     	return breakerStateEventManager;
     }
     
-    public boolean isClosedForThisCall() {
-    	boolean isClosedForThisCall;
-    	synchronized(this) {
-    		isClosedForThisCall = breakerState.isClosedForThisCall();
-    	}
-    	breakerStateEventManager.processEventQueue();
-    	return isClosedForThisCall;
+    public synchronized boolean isClosedForThisCall() {
+    	return breakerState.isClosedForThisCall();
     }
-    public void callFailed(long callDuration) {
-    	synchronized(this) {
-    		breakerState.callFailed(callDuration);
-    	}
-    	breakerStateEventManager.processEventQueue();
+    public synchronized void callFailed(long callDuration) {
+   		breakerState.callFailed(callDuration);
     }
-    public void callSucceeded(long callDuration) {
-    	synchronized(this) {
-    		breakerState.callSucceeded(callDuration);
-    	}
-    	breakerStateEventManager.processEventQueue();
+    public synchronized void callSucceeded(long callDuration) {
+   		breakerState.callSucceeded(callDuration);
     }
     
     //------ Only Private and Default access methods bellow --------------------------

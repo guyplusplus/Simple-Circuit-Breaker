@@ -2,18 +2,26 @@ package com.geckotechnology.simpleCircuitBreaker;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.Test;
 
 public class Transition4Test {
 	
-	private CircuitBreakerStateChangeEvent lastEvent;
+	private AtomicInteger eventCount = new AtomicInteger();
+	private static final LinkedList<BreakerStateType> EXPECTED_STATES = new LinkedList<BreakerStateType>(Arrays.asList(
+			BreakerStateType.OPEN,
+			BreakerStateType.CLOSED
+			));
 
 	/**
 	 * Test transitions : closed -> open -> closed via permittedNumberOfCallsInHalfOpenState=0
 	 * Event type: call failure
 	 */
 	@Test
-	public void test1() {
+	public void test() {
 		CircuitBreakerConfig config = new CircuitBreakerConfig();
 		config.setSlidingWindowSize(5);
 		config.setFailureRateThreshold(70);
@@ -28,7 +36,14 @@ public class Transition4Test {
 			@Override
 			public void onCircuitBreakerStateChangeEvent(CircuitBreakerStateChangeEvent event) {
 				System.out.println("CircuitBreaker state changed. " + event);
-				lastEvent = event;
+				eventCount.incrementAndGet();
+			}
+		});
+		circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new BreakerStateEventListener() {
+			@Override
+			public void onCircuitBreakerStateChangeEvent(CircuitBreakerStateChangeEvent event) {
+				eventCount.incrementAndGet();
+				assertEquals(event.getNewBreakerStateType(), EXPECTED_STATES.pollFirst());
 			}
 		});
 		
@@ -60,15 +75,12 @@ public class Transition4Test {
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callSucceeded(10);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertNull(lastEvent);
 		TestUtils.sleep(1000);
 
 		//time 11: CLOSED Fail, trip as 3F2S (3 fail, 1 success, ratio 75% > 70%)
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		circuitBreaker.callFailed(10);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.OPEN);
-		assertEquals(lastEvent.getNewBreakerStateType(), BreakerStateType.OPEN);
-		lastEvent = null;
 		TestUtils.sleep(1000);
 
 		//time 12: OPEN
@@ -88,14 +100,11 @@ public class Transition4Test {
 		//time 14: OPEN
 		assertFalse(circuitBreaker.isClosedForThisCall());
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.OPEN);
-		assertNull(lastEvent);
 		TestUtils.sleep(1200);
 	
 		//time 15: CLOSED is over Success
 		assertTrue(circuitBreaker.isClosedForThisCall());
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
-		assertEquals(lastEvent.getNewBreakerStateType(), BreakerStateType.CLOSED);
-		lastEvent = null;
 		circuitBreaker.callSucceeded(10);
 		TestUtils.sleep(1000);
 
@@ -104,7 +113,9 @@ public class Transition4Test {
 		circuitBreaker.callFailed(10);
 		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
 		
-		//the end. Queue is empty
-		assertEquals(circuitBreaker.getBreakerStateEventManager().getEventQueueLength(), 0);
+		//the end. The right number of events was received
+		TestUtils.sleep(1000);
+		assertEquals(eventCount.get(), 2*2);
+		assertEquals(EXPECTED_STATES.size(), 0);
 	}
 }
