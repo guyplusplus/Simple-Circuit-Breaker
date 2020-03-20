@@ -18,6 +18,7 @@ public class Transition4Test {
 
 	/**
 	 * Test transitions : closed -> open -> closed via permittedNumberOfCallsInHalfOpenState=0
+	 * Test also exception handling in event listener loop
 	 * Event type: call failure
 	 */
 	@Test
@@ -37,6 +38,13 @@ public class Transition4Test {
 			public void onCircuitBreakerStateChangeEvent(CircuitBreakerStateChangeEvent event) {
 				System.out.println("CircuitBreaker state changed. " + event);
 				eventCount.incrementAndGet();
+			}
+		});
+		circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new BreakerStateEventListener() {
+			@Override
+			public void onCircuitBreakerStateChangeEvent(CircuitBreakerStateChangeEvent event) {
+				eventCount.incrementAndGet();
+				throw new RuntimeException("Test exception in listener");
 			}
 		});
 		circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new BreakerStateEventListener() {
@@ -115,7 +123,7 @@ public class Transition4Test {
 		
 		//the end. The right number of events was received
 		TestUtils.sleep(1000);
-		assertEquals(eventCount.get(), 2*2);
+		assertEquals(eventCount.get(), 3*2);
 		assertEquals(EXPECTED_STATES.size(), 0);
 	}
 }

@@ -44,6 +44,8 @@ public class BreakerStateEventManager {
 						listener.onCircuitBreakerStateChangeEvent(event);
 					}
 					catch(Exception e) {
+						System.err.println("Problem while notifying event listener. event:{" +
+								event + "}, listener:{" + listener + "}");
 						e.printStackTrace();
 					}
 				}				
