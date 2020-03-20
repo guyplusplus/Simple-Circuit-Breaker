@@ -76,15 +76,15 @@ Load test, included in the JUnit tests, shows an overhead less than 0.05ms per w
 The load test is based on 4 concurrent threads running with a CLOSED circuit breaker, with a wrapped logic around 6.5ms.
 
 ## Concurrency
-The code has 3 methods with a synchronized portion, it has minimum impact to initial code performance. Actual business logic (`doSomething` in the pseudo-code above) is not included in the synchronized code, so blocking time is minimum
+The code has 3 synchronized methods, it has minimum impact to initial code performance. Actual business logic (`doSomething()` in the pseudo-code above) is not included in the synchronized code, so blocking time is minimum
   - `boolean isClosedForThisCall()` to check the state of the breaker for this current call
   - `void callFailed(long callDuration)` to inform the breaker that the call failed
   - `void callSucceeded(long callDuration)` to inform the breaker that the call succeeded
 
-Registered EventListeners are informed by the thread performing the business logic, but outside any synchronized code. 
-
 ## Event Listeners
 The library supports listening for breaker state events. Registration and event consumption is straight forward. [DemoApp](https://github.com/guyplusplus/Simple-Circuit-Breaker/blob/master/src/test/java/com/geckotechnology/simpleCircuitBreaker/DemoApp.java) contains an example.
+
+Registered Event Listeners are notified by a background thread. 
 
 ```java
 circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new BreakerStateEventListener() {
