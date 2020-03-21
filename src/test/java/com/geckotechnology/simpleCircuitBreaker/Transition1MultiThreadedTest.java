@@ -16,11 +16,16 @@ public class Transition1MultiThreadedTest {
 		Thread threads[] = new Thread[THREAD_COUNT];
 		for(int i = 0; i<THREAD_COUNT; i++) {
 			threads[i] = new Thread() {
+				private int threadId;
+				private Thread init(int threadId) {
+					this.threadId = threadId;
+					return this;
+				}
 				@Override
 				public void run() {
-					test();
+					test(threadId);
 				}
-			};
+			}.init(i);
 			TestUtils.sleep(207);
 			threads[i].start();
 		}
@@ -42,8 +47,9 @@ public class Transition1MultiThreadedTest {
 	 * Event type: call failure
 	 * Test also the second listener
 	 */
-	private void test() {
+	private void test(int threadId) {
 		CircuitBreakerConfig config = new CircuitBreakerConfig();
+		config.setName("breaker-" + threadId);
 		config.setSlidingWindowSize(5);
 		config.setFailureRateThreshold(70);
 		config.setWaitDurationInOpenState(4000);
