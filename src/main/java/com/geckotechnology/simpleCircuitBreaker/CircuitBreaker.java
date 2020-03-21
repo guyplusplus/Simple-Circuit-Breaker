@@ -22,6 +22,10 @@ public class CircuitBreaker {
     	return breakerStateEventManager;
     }
     
+    public CircuitBreakerConfig getCloneOfCircuitBreakerConfig() {
+    	return circuitBreakerConfig.clone();
+    }
+    
     public synchronized boolean isClosedForThisCall() {
     	return breakerState.isClosedForThisCall();
     }
