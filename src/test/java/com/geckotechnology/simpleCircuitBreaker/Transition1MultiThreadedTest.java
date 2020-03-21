@@ -15,18 +15,14 @@ public class Transition1MultiThreadedTest {
 	public void testMultiThread() {
 		Thread threads[] = new Thread[THREAD_COUNT];
 		for(int i = 0; i<THREAD_COUNT; i++) {
+			final AtomicInteger threadId = new AtomicInteger(i);
 			threads[i] = new Thread() {
-				private int threadId;
-				private Thread init(int threadId) {
-					this.threadId = threadId;
-					return this;
-				}
 				@Override
 				public void run() {
-					test(threadId);
+					test(threadId.intValue());
 				}
-			}.init(i);
-			TestUtils.sleep(207);
+			};
+			TestUtils.sleep(200);
 			threads[i].start();
 		}
 		for(int i = 0; i<THREAD_COUNT; i++) {
