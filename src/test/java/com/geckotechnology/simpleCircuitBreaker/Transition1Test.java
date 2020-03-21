@@ -226,4 +226,69 @@ public class Transition1Test {
 		assertEquals(eventCount.get(), 3*8);
 		assertEquals(EXPECTED_STATES.size(), 0);
 	}
+	
+	/**
+	 * Test transitions : closed -> open
+	 * Event type: call failure
+	 * Test with 1 second window
+	 */
+	@Test
+	public void testWindow1Sec() {
+		CircuitBreakerConfig config = new CircuitBreakerConfig();
+		config.setSlidingWindowSize(1);
+		config.setFailureRateThreshold(70);
+		config.setWaitDurationInOpenState(4000);
+		config.setMinimumNumberOfCalls(3);
+		config.setPermittedNumberOfCallsInHalfOpenState(2);
+		config.setSlowCallDurationThreshold(1);
+		config.setSlowCallRateThreshold(0);
+		config.setMaxDurationOpenInHalfOpenState(5000);
+		CircuitBreaker circuitBreaker = new CircuitBreaker(config);
+
+		//time 0: CLOSED Failed
+		assertTrue(circuitBreaker.isClosedForThisCall());
+		circuitBreaker.callFailed(10);
+		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches(circuitBreaker, 1, 1, 1));
+
+		//time 0: CLOSED Failed
+		assertTrue(circuitBreaker.isClosedForThisCall());
+		circuitBreaker.callFailed(10);
+		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches(circuitBreaker, 2, 2, 2));
+		TestUtils.sleep(1000);
+		
+		//time 1: CLOSED Failed
+		assertTrue(circuitBreaker.isClosedForThisCall());
+		circuitBreaker.callFailed(10);
+		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches(circuitBreaker, 1, 1, 1));
+
+		//time 1: CLOSED Failed
+		assertTrue(circuitBreaker.isClosedForThisCall());
+		circuitBreaker.callFailed(10);
+		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches(circuitBreaker, 2, 2, 2));
+		TestUtils.sleep(1000);
+		
+		//time 2: CLOSED Failed
+		assertTrue(circuitBreaker.isClosedForThisCall());
+		circuitBreaker.callFailed(10);
+		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches(circuitBreaker, 1, 1, 1));
+
+		//time 2: CLOSED Failed
+		assertTrue(circuitBreaker.isClosedForThisCall());
+		circuitBreaker.callFailed(10);
+		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.CLOSED);
+		assertTrue(TestUtils.validateAggregatedCountStatsMatches(circuitBreaker, 2, 2, 2));
+
+		//time 2: CLOSED Failed
+		assertTrue(circuitBreaker.isClosedForThisCall());
+		circuitBreaker.callFailed(10);
+		assertEquals(circuitBreaker.getBreakerState().getBreakerStateType(), BreakerStateType.OPEN);
+
+		//time 2: OPEN
+		assertFalse(circuitBreaker.isClosedForThisCall());
+	}
 }
