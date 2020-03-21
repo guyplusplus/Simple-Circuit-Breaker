@@ -57,7 +57,7 @@ public class Transition1TestMultiThreaded {
 			@Override
 			public void onCircuitBreakerStateChangeEvent(CircuitBreakerStateChangeEvent event) {
 				eventCount.incrementAndGet();
-				System.out.println("CircuitBreaker state changed. " + event);
+				//System.out.println("CircuitBreaker state changed. " + event);
 			}
 		});
 		circuitBreaker.getBreakerStateEventManager().addBreakerStateEventListener(new BreakerStateEventListener() {
