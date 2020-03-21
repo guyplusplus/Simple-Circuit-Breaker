@@ -38,25 +38,31 @@ public class CircuitBreakerConfigTest {
 	}
 	
 	@Test
-	public void testConfig() throws Exception {
+	public void testConfigFromProperties() throws Exception {
 		Properties props = new Properties();
 		InputStream is = CircuitBreakerConfigTest.class.getResourceAsStream("/configTest.config");
 		props.load(is);
 		is.close();
 		CircuitBreakerConfig config = new CircuitBreakerConfig(props);
-		assertEquals(config.getName(), "TEST");
-		assertTrue(config.getFailureRateThreshold() == 6f);
-		assertTrue(config.getSlowCallRateThreshold() == 7f);
-		assertEquals(config.getSlowCallDurationThreshold(), 4);
-		assertEquals(config.getPermittedNumberOfCallsInHalfOpenState(), 3);
-		assertEquals(config.getSlidingWindowSize(), 2);
-		assertEquals(config.getMinimumNumberOfCalls(), 5);
-		assertEquals(config.getWaitDurationInOpenState(), 8);
-		assertEquals(config.getMaxDurationOpenInHalfOpenState(), 9);
+		System.out.println("round 1: load from properties");
+		for(int i = 0; i<1; i++) {
+			assertEquals(config.getName(), "TEST");
+			assertTrue(config.getFailureRateThreshold() == 6f);
+			assertTrue(config.getSlowCallRateThreshold() == 7f);
+			assertEquals(config.getSlowCallDurationThreshold(), 4);
+			assertEquals(config.getPermittedNumberOfCallsInHalfOpenState(), 3);
+			assertEquals(config.getSlidingWindowSize(), 2);
+			assertEquals(config.getMinimumNumberOfCalls(), 5);
+			assertEquals(config.getWaitDurationInOpenState(), 8);
+			assertEquals(config.getMaxDurationOpenInHalfOpenState(), 9);
+			CircuitBreaker breaker = new CircuitBreaker(config);
+			config = breaker.getCircuitBreakerConfig();
+			System.out.println("Round 2: from circuit breaker, check clone is ok");
+		}
 	}
 	
 	@Test
-	public void testConfigWithPrefix() throws Exception {
+	public void testConfigFromPropertiesWithPrefix() throws Exception {
 		Properties props = new Properties();
 		InputStream is = CircuitBreakerConfigTest.class.getResourceAsStream("/configTest.config");
 		props.load(is);
