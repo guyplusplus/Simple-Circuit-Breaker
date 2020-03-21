@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
-public class Transition1TestMultiThreaded {
+public class Transition1MultiThreadedTest {
 	
 	private static final int THREAD_COUNT = 64;
 	private AtomicInteger eventCount = new AtomicInteger();
