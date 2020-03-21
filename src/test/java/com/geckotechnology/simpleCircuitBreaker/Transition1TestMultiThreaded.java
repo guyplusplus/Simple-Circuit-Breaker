@@ -8,7 +8,7 @@ import org.junit.Test;
 
 public class Transition1TestMultiThreaded {
 	
-	private static final int THREAD_COUNT = 24;
+	private static final int THREAD_COUNT = 64;
 	private AtomicInteger eventCount = new AtomicInteger();
 	
 	@Test
@@ -21,6 +21,7 @@ public class Transition1TestMultiThreaded {
 					test();
 				}
 			};
+			TestUtils.sleep(207);
 			threads[i].start();
 		}
 		for(int i = 0; i<THREAD_COUNT; i++) {
