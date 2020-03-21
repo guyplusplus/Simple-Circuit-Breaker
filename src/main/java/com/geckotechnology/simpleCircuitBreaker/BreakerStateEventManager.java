@@ -30,6 +30,13 @@ public class BreakerStateEventManager {
 		return breakerStateEventListeners.remove(listener);
 	}
 	
+	/**
+	 * Remove all listeners
+	 */
+	public void removeAllBreakerStateEventListeners() {
+		breakerStateEventListeners.clear();
+	}
+	
     //------ Only Private and Default access methods bellow --------------------------
     
 	void registerEvent(final CircuitBreakerStateChangeEvent event) {
