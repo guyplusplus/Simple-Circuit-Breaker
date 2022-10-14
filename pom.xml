@@ -13,8 +13,8 @@
 
   <licenses>
     <license>
-      <name>GPL 3.0</name>
-      <url>https://github.com/guyplusplus/Simple-Circuit-Breaker/LICENSE</url>
+      <name>apache-2.0</name>
+      <url>https://github.com/guyplusplus/Simple-Circuit-Breaker/LICENSE.txt</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
